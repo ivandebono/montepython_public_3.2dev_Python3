@@ -212,7 +212,6 @@ class Data(object):
 
         # Test if the recovered path agrees with the one extracted from
         # the configuration file.
-        print('!!!!!!!!!PATH',self.path)
         if self.path != {}:
             if 'root' not in self.path:
                 self.path.update({'root': path['root']})
@@ -225,10 +224,8 @@ class Data(object):
         # Determine which cosmological code is in use
         if self.path['cosmo'].find('class') != -1:
             self.cosmological_module_name = 'CLASS'
-            print(self.path['cosmo'])
         else:
             self.cosmological_module_name = None
-            print('CLASS NOT FOUND!!!!!!!!!!!!')
 
         # check for MPI
         try:

@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 # Module to handle warnings from matplotlib
 import warnings
 import importlib
-from . import io_mp
+import io_mp
 from itertools import filterfalse
 
 import scipy.ndimage
@@ -1751,10 +1751,10 @@ def remove_bad_points(info):
 
         basename = os.path.basename(chain_file)
         if index == 0:
-            exec("print '--> Scanning file %-{0}s' % chain_file,".format(
+            exec("print('--> Scanning file %-{0}s' % chain_file,)".format(
                 max_name_length))
         else:
-            exec("print '%{0}s%-{1}s' % ('', basename),".format(
+            exec("print('%{0}s%-{1}s' % ('', basename),)".format(
                 empty_length, total_length-empty_length))
         # cheese will brutally contain everything in the chain chain_file being
         # scanned

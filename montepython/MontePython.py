@@ -35,9 +35,6 @@ if __name__ == '__main__':
     if MPI_ASKED:
 #         # This import has to be there in case MPI is not installed
         from run import mpi_run
-        print('MPIRUN')
         sys.exit(mpi_run())
     else:
-        print('RUN')
-        run()
-        #sys.exit(run())
+        sys.exit(run())

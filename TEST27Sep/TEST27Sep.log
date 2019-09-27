@@ -1,0 +1,7 @@
+2019-09-27_500__1.txt	  Number of steps:500	 Steps accepted:193	 acc = 0.39	min(-loglike) = 0.01
+2019-09-27_5000__1.txt	  Number of steps:5000	 Steps accepted:1638	 acc = 0.33	min(-loglike) = 0.01
+2019-09-27_5000__2.txt	  Number of steps:5000	 Steps accepted:1980	 acc = 0.4	min(-loglike) = 0.01
+2019-09-27_10__1.txt	  Number of steps:10	 Steps accepted:5	 acc = 0.5	min(-loglike) = 0.59
+--> Total    number    of    steps: 10510
+--> Total number of accepted steps: 3816
+--> Minimum of -logLike           : 0.01
