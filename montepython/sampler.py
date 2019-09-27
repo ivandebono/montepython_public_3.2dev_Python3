@@ -790,7 +790,7 @@ def compute_lkl(cosmo, data):
         try:
             derived = cosmo.get_current_derived_parameters(
                 data.get_mcmc_parameters(['derived']))
-            for name, value in derived.iteritems():
+            for name, value in derived.items():
                 data.mcmc_parameters[name]['current'] = value
         except AttributeError:
             # This happens if the classy wrapper is still using the old

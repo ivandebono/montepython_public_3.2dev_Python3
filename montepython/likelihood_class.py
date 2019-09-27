@@ -1942,7 +1942,7 @@ class Likelihood_mpk(Likelihood):
         for key, value in common_dictionary.items():
             # First, check if the parameter exists already
             try:
-                exec("self.%s" % key)
+                exec("self.{}".format(key))
                 warnings.warn(
                     "parameter %s from likelihood %s will be replaced by " +
                     "the common knowledge routine" % (key, self.name))
