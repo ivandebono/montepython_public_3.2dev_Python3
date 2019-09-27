@@ -3,12 +3,12 @@ import os
 from copy import copy
 import warnings
 import glob
-import io_mp
+from . import io_mp
 
 import numpy as np
 import pandas as pd
 
-import sampler
+from . import sampler
 
 from nnest import NestedSampler, MCMCSampler
 
@@ -109,7 +109,7 @@ def initialise(cosmo, data, command_line):
 
     run_num = sum(os.path.isdir(os.path.join(NN_folder,i)) for i in os.listdir(NN_folder)) + 1
 
-    print('run_num', run_num)
+    print(('run_num', run_num))
 
     # -- Automatic arguments
     data.NN_arguments['x_dim'] = len(varying_param_names)
@@ -197,7 +197,7 @@ def run(cosmo, data, command_line):
                 logl = sampler.compute_lkl(cosmo, data)
                 if not np.isfinite(logl):
                     print('Nan encountered in likelihood')
-                    print(data.mcmc_parameters)
+                    print((data.mcmc_parameters))
                 logls.append(logl)
             logls = np.array(logls)
             return logls
@@ -248,7 +248,7 @@ def run(cosmo, data, command_line):
                     logl = sampler.compute_lkl(cosmo, data)
                     if not np.isfinite(logl):
                         print('Nan encountered in likelihood')
-                        print(data.mcmc_parameters)
+                        print((data.mcmc_parameters))
                 else:
                     logl = data.boundary_loglike
                 logls.append(logl)
@@ -293,10 +293,10 @@ def from_NN_output_to_chains(folder):
         with open(argumentsfile) as f:
             d=dict((l.replace(" ", "").strip().split('=')) for l in f)
         num_derived=int(d.get('num_derived'))
-        print('%s derived parameters' % str(num_derived))
+        print(('%s derived parameters' % str(num_derived)))
 ###########
 
-    print('Converting %s to MontePython chains' % str(folder))
+    print(('Converting %s to MontePython chains' % str(folder)))
     logzs, nlikes, chainfiles = [], [], []
 
 
@@ -321,8 +321,8 @@ def from_NN_output_to_chains(folder):
         else:
             logzs_error = 0
             nlikes_error = 0
-        print(r'Log z: %4.2f \pm %4.2f' % (logzs_mean, logzs_error))
-        print(r'Number of likelihood evaluations: %.0f \pm %.0f' % (nlikes_mean, nlikes_error))
+        print((r'Log z: %4.2f \pm %4.2f' % (logzs_mean, logzs_error)))
+        print((r'Number of likelihood evaluations: %.0f \pm %.0f' % (nlikes_mean, nlikes_error)))
         print('')
 
     for ic in np.arange(len(chainfiles)):

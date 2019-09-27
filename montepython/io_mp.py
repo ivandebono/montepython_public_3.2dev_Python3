@@ -67,7 +67,7 @@ def log_likelihood_parameters(likelihood, command_line):
     with open(os.path.join(command_line.folder, 'log.param'), 'a') as log:
     #tolog = open(likelihood.path, 'r')
         log.write("\n\n#-----Likelihood-{0}-----\n".format(likelihood.name))
-        for key, value in likelihood.dictionary.iteritems():
+        for key, value in likelihood.dictionary.items():
             if type(value) != type(''):
                 log.write("%s.%s = %s\n" % (
                     likelihood.name, key, value))
@@ -115,7 +115,7 @@ def log_default_configuration(data, command_line):
     """
     log = open(os.path.join(command_line.folder, 'log.param'), 'a')
     log.write('\n\n#--------Default-Configuration------\n')
-    for key, value in data.path.iteritems():
+    for key, value in data.path.items():
         log.write("data.path['{0}']\t= '{1}'\n".format(key, value))
     log.close()
 
@@ -270,12 +270,12 @@ def create_output_files(command_line, data):
                 suffix += 1
         data.out_name = os.path.join(
             command_line.folder, outname_base)+str(suffix)+'.txt'
-        print 'Creating %s\n' % data.out_name
+        print('Creating %s\n' % data.out_name)
     else:
         data.out_name = os.path.join(
             command_line.folder, outname_base)+command_line.chain_number+'.txt'
         data.out = open(data.out_name, 'w')
-        print 'Creating %s\n' % data.out_name
+        print('Creating %s\n' % data.out_name)
     # in case of a restart, copying the whole thing in the new file
     if command_line.restart is not None:
         # Construct filename of old chain from input.
@@ -423,7 +423,7 @@ def pretty_print(string, status, return_string=False):
         if return_string:
             output += '\n'
         else:
-            print
+            print()
 
     # Add in front the appropriate fancy display
     index = 0
@@ -437,7 +437,7 @@ def pretty_print(string, status, return_string=False):
         if return_string:
             output += START_LINE[status][start_index]+line+'\n'
         else:
-            print START_LINE[status][start_index]+line
+            print(START_LINE[status][start_index]+line)
         index += 1
     if return_string:
         return output
@@ -449,8 +449,14 @@ def safe_exec(string):
     """Attempt at executing a string from file in a secure way"""
     exec(string, {'__builtins__': {}})
 
+## Modified by Ivan Debono
+## for compatibility with Python 3
+class cfile():
+    def file():
+        return open(file)
+#########
 
-class File(file):
+class File(cfile):   #This line modified by Ivan Debono
     """
     New class of file, to provide an equivalent of the tail command (on linux).
 

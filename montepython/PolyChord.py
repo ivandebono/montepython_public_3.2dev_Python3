@@ -22,8 +22,8 @@ import numpy as np
 import os
 from copy import copy
 import warnings
-import io_mp
-import sampler
+from . import io_mp
+from . import sampler
 
 # Data on file names and PolyChord options, that may be called by other modules
 
@@ -370,7 +370,7 @@ def run(cosmo, data, command_line):
 
     # Pass over the settings
     settings = PC_Settings(nDims,nDerived)
-    for arg, val in data.PC_arguments.iteritems():
+    for arg, val in data.PC_arguments.items():
         setattr(settings, arg, val)
 
     # Launch PolyChord

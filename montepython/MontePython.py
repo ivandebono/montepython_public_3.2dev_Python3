@@ -9,7 +9,7 @@ Monte Python, a Monte Carlo Markov Chain code (with Class!)
 import sys
 import warnings
 
-import io_mp       # all the input/output mechanisms
+import io_mp # all the input/output mechanisms 
 from run import run
 
 
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     # Default action when facing a warning is being remapped to a custom one
     warnings.showwarning = io_mp.warning_message
 
-    # MPI is tested for, and if a different than one number of cores is found,
+    # MPI is tested for, and if a different the number of cores is greater than 1,
     # it runs mpi_run instead of a simple run.
     MPI_ASKED = False
     try:
@@ -33,8 +33,11 @@ if __name__ == '__main__':
         pass
 
     if MPI_ASKED:
-        # This import has to be there in case MPI is not installed
+#         # This import has to be there in case MPI is not installed
         from run import mpi_run
+        print('MPIRUN')
         sys.exit(mpi_run())
     else:
-        sys.exit(run())
+        print('RUN')
+        run()
+        #sys.exit(run())

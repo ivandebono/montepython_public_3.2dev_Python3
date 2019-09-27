@@ -19,8 +19,8 @@ import numpy as np
 import os
 from copy import copy
 import warnings
-import io_mp
-import sampler
+from . import io_mp
+from . import sampler
 
 # Data on file names and MultiNest options, that may be called by other modules
 
@@ -253,7 +253,7 @@ def run(cosmo, data, command_line):
         Please see the encompassing function docstring
 
         """
-        for i, name in zip(range(ndim), NS_param_names):
+        for i, name in zip(list(range(ndim)), NS_param_names):
             cube[i] = data.mcmc_parameters[name]['prior']\
                 .map_from_unit_interval(cube[i])
 
@@ -264,7 +264,7 @@ def run(cosmo, data, command_line):
 
         """
         # Updates values: cube --> data
-        for i, name in zip(range(ndim), NS_param_names):
+        for i, name in zip(list(range(ndim)), NS_param_names):
             data.mcmc_parameters[name]['current'] = cube[i]
         # Propagate the information towards the cosmo arguments
         data.update_cosmo_arguments()

@@ -126,7 +126,7 @@ def recover_local_path(command_line):
         if os.path.isfile(conf_file):
             for line in open(conf_file):
                 exec(line)
-            for key, value in path.iteritems():
+            for key, value in path.items():
                 path[key] = os.path.normpath(os.path.expanduser(value))
         else:
             # The error is ignored if reading from a log.param, because it is

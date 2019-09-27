@@ -423,7 +423,7 @@ class Test06MetropolisHastingsImportanceSampling(TestMontePython):
         ## Run an Importance sampling run on this data
         is_folder = self.folder + '_is'
         custom_command = (
-            'run -p test_is.param -o %s' % is_folder +
+            'run -p input/test_is.param -o %s' % is_folder +
             ' -m IS --IS-starting-folder %s' % self.folder)
         run(custom_command)
         # Check that the file has been copied, and that both the likelihood and
@@ -455,7 +455,7 @@ class Test07CosmoHammerBehaviour(TestMontePython):
         self.date = str(datetime.date.today())
         self.custom_command = (
             'run -N 1 -p input/test.param -o tests/test_%s' % self.date +
-            ' --method CH')
+            ' -m CH')
         self.cosmo, self.data, self.command_line, _ = initialise(
             self.custom_command)
 
@@ -482,7 +482,7 @@ class Test08MultiNestBehaviour(TestMontePython):
         self.folder = os.path.join('tests', 'test_%s' % self.date)
         self.custom_command = (
             'run -N 1 -p input/test_gaussian.param -o %s' % self.folder +
-            ' --method NS --NS_n_live_points 30 --NS_max_iter 10')
+            ' -m NS --NS_n_live_points 30 --NS_max_iter 10')
         self.cosmo, self.data, self.command_line, _ = initialise(
             self.custom_command)
 
@@ -507,7 +507,7 @@ class Test09PolyChordBehaviour(TestMontePython):
         self.folder = os.path.join('tests', 'test_%s' % self.date)
         self.custom_command = (
             'run -N 1 -p input/test_gaussian.param -o %s' % self.folder +
-            ' --method PC --PC_n_live_points 30 --PC_max_iter 10')
+            ' -m PC --PC_nlive 30 --PC_max_ndead 10')
         self.cosmo, self.data, self.command_line, _ = initialise(
             self.custom_command)
 

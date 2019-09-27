@@ -194,7 +194,7 @@ def safe_initialisation(custom_command="", comm=None, nprocs=1):
         if comm:
             for index in range(1, nprocs):
                 comm.send('failed', dest=index, tag=1)
-        print str(message)
+        print(str(message))
         raise io_mp.ConfigurationError(
             "The initialisation was not successful, resulting in a "
             "potentially half created `log.param`. Please see the "

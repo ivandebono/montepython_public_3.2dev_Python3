@@ -39,8 +39,8 @@ import warnings
 import scipy.linalg as la
 from pprint import pprint
 
-import io_mp
-import sampler
+from . import io_mp
+from . import sampler
 
 
 def get_new_position(data, eigv, U, k, Cholesky, Rotation):
@@ -273,13 +273,13 @@ def chain(cosmo, data, command_line):
                 jump_value = jump_file.read().replace('# ','')
                 data.jumping_factor = float(jump_value)
 	    jump_file.close()
-	    print 'rank = ',rank
+	    print('rank = ',rank)
         except:
 	    jump_file = open(command_line.folder + '/jumping_factor.txt','w')
 	    jump_file.write(str(data.jumping_factor))
 	    jump_file.close()
 	    rank = 0
-	    print 'rank = ',rank
+	    print('rank = ',rank)
             starting_jumping_factor = data.jumping_factor
 
     # Recover the covariance matrix according to the input, if the varying set
@@ -304,14 +304,14 @@ def chain(cosmo, data, command_line):
             with open(fname, 'w') as f:
                 f.write('# minimized \chi^2 = {:} \n'.format(min_chi2))
                 f.write('# %s\n' % ', '.join(['%16s' % label for label in labels]))
-                for idx in xrange(len(labels)):
+                for idx in range(len(labels)):
                     bf_value = minimum[idx]
                     if bf_value > 0:
                         f.write(' %.6e\t' % bf_value)
                     else:
                         f.write('%.6e\t' % bf_value)
                 f.write('\n')
-            print 'Results of minimizer saved to: \n', fname
+            print('Results of minimizer saved to: \n', fname)
 
         # if we want to compute Fisher matrix and then stop
         if command_line.fisher:
@@ -368,8 +368,8 @@ def chain(cosmo, data, command_line):
     # If the update mode was selected, the previous (or original) matrix should be stored
     if command_line.update:
         if not rank and not command_line.silent:
-            print 'Update routine is enabled with value %d (recommended: 50)' % command_line.update
-            print 'This number is rescaled by cycle length %d (N_slow + f_fast * N_fast) to %d' % (fpm,fpm*command_line.update)
+            print('Update routine is enabled with value %d (recommended: 50)' % command_line.update)
+            print('This number is rescaled by cycle length %d (N_slow + f_fast * N_fast) to %d' % (fpm,fpm*command_line.update))
         # Rescale update number by cycle length N_slow + f_fast * N_fast to account for fast parameters
         command_line.update *= fpm
         previous = (sigma_eig, U, C, Cholesky)
@@ -377,9 +377,9 @@ def chain(cosmo, data, command_line):
     # Initialise adaptive
     if command_line.adaptive:
         if not command_line.silent:
-            print 'Adaptive routine is enabled with value %d (recommended: 10*dimension)' % command_line.adaptive
-            print 'and adaptive_ts = %d (recommended: 100*dimension)' % command_line.adaptive_ts
-            print 'Please note: current implementation not suitable for multiple chains'
+            print('Adaptive routine is enabled with value %d (recommended: 10*dimension)' % command_line.adaptive)
+            print('and adaptive_ts = %d (recommended: 100*dimension)' % command_line.adaptive_ts)
+            print('Please note: current implementation not suitable for multiple chains')
         if rank > 0:
             raise io_mp.ConfigurationError('Adaptive routine not compatible with MPI')
         if command_line.update:
@@ -411,11 +411,11 @@ def chain(cosmo, data, command_line):
     # Initialize superupdate
     if command_line.superupdate:
         if not rank and not command_line.silent:
-            print 'Superupdate routine is enabled with value %d (recommended: 20)' % command_line.superupdate
+            print('Superupdate routine is enabled with value %d (recommended: 20)' % command_line.superupdate)
             if command_line.superupdate < 20:
                 warnings.warn('Superupdate value lower than the recommended value. This '
                               'may increase the risk of poorly converged acceptance rate')
-            print 'This number is rescaled by cycle length %d (N_slow + f_fast * N_fast) to %d' % (fpm,fpm*command_line.superupdate)
+            print('This number is rescaled by cycle length %d (N_slow + f_fast * N_fast) to %d' % (fpm,fpm*command_line.superupdate))
         # Rescale superupdate number by cycle length N_slow + f_fast * N_fast to account for fast parameters
         command_line.superupdate *= fpm
         # Define needed parameters
@@ -438,8 +438,8 @@ def chain(cosmo, data, command_line):
         # Make sure update is enabled
         if command_line.update == 0:
             if not rank and not command_line.silent:
-                print 'Update routine required by superupdate. Setting --update 50'
-                print 'This number is then rescaled by cycle length: %d (N_slow + f_fast * N_fast)' % fpm
+                print('Update routine required by superupdate. Setting --update 50')
+                print('This number is then rescaled by cycle length: %d (N_slow + f_fast * N_fast)' % fpm)
             command_line.update = 50 * fpm
             previous = (sigma_eig, U, C, Cholesky)
 
@@ -538,7 +538,7 @@ def chain(cosmo, data, command_line):
             if not rank:
                 # Add the folder to the list of files to analyze, and switch on the
                 # options for computing only the covmat
-                from parser_mp import parse
+                from .parser_mp import parse
                 info_command_line = parse(
                     'info %s --minimal --noplot --keep-fraction 0.5 --keep-non-markovian --want-covmat' % command_line.folder)
                 info_command_line.update = command_line.update
@@ -563,7 +563,7 @@ def chain(cosmo, data, command_line):
                     # Try to launch an analyze (computing a new covmat if successful)
                     try:
                         if not (k+10) % command_line.update:
-                            from analyze import analyze
+                            from .analyze import analyze
                             R_minus_one = analyze(info_command_line)
                         elif command_line.superupdate:
                             # Compute (only, i.e. no covmat) R-1 more often when using superupdate
@@ -573,7 +573,7 @@ def chain(cosmo, data, command_line):
                             R_minus_one = analyze(info_command_line)
                     except:
                         if not command_line.silent:
-                            print 'Step ',k,' chain ', rank,': Failed to calculate covariance matrix'
+                            print('Step ',k,' chain ', rank,': Failed to calculate covariance matrix')
 
                 if command_line.superupdate:
                     # Start of superupdate routine
@@ -611,7 +611,7 @@ def chain(cosmo, data, command_line):
                                 stop_c = True
                                 data.out.write('# After %d accepted steps: stop adapting the jumping factor at a value of %f with a local acceptance rate %f \n' % (int(acc),data.jumping_factor,np.mean(backup_ar)))
                                 if not command_line.silent:
-                                    print 'After %d accepted steps: stop adapting the jumping factor at a value of %f with a local acceptance rate of %f \n' % (int(acc), data.jumping_factor,np.mean(backup_ar))
+                                    print('After %d accepted steps: stop adapting the jumping factor at a value of %f with a local acceptance rate of %f \n' % (int(acc), data.jumping_factor,np.mean(backup_ar)))
                                 jump_file = open(command_line.folder + '/jumping_factor.txt','w')
                                 jump_file.write('# '+str(data.jumping_factor))
                                 jump_file.close()
@@ -623,7 +623,7 @@ def chain(cosmo, data, command_line):
                     # Write the evolution of the jumping factor to a file
                     if not k % (command_line.superupdate):
                         jump_file = open(command_line.folder + '/jumping_factors.txt','a')
-                        for i in xrange(command_line.superupdate):
+                        for i in range(command_line.superupdate):
                             jump_file.write(str(c_array[i])+'\n')
                         jump_file.close()
                     # End of main part of superupdate routine
@@ -667,7 +667,7 @@ def chain(cosmo, data, command_line):
                                         new_jumping_factor = data.jumping_factor * (prev_cov_det/cov_det)**(1./(2 * len(parameter_names)))
                                         data.out.write('# After %d accepted steps: rescaled jumping factor from %f to %f, due to updated covariance matrix \n' % (int(acc), data.jumping_factor, new_jumping_factor))
                                         if not command_line.silent:
-                                            print 'After %d accepted steps: rescaled jumping factor from %f to %f, due to updated covariance matrix \n' % (int(acc), data.jumping_factor, new_jumping_factor)
+                                            print('After %d accepted steps: rescaled jumping factor from %f to %f, due to updated covariance matrix \n' % (int(acc), data.jumping_factor, new_jumping_factor))
                                         data.jumping_factor = new_jumping_factor
                                     else:
                                         data.jumping_factor = starting_jumping_factor
@@ -677,11 +677,11 @@ def chain(cosmo, data, command_line):
                                 # Write to chains file when the covmat was updated
                                 data.out.write('# After %d accepted steps: update proposal with max(R-1) = %f and jumping factor = %f \n' % (int(acc), max(R_minus_one), data.jumping_factor))
                                 if not command_line.silent:
-                                    print 'After %d accepted steps: update proposal with max(R-1) = %f and jumping factor = %f \n' % (int(acc), max(R_minus_one), data.jumping_factor)
+                                    print('After %d accepted steps: update proposal with max(R-1) = %f and jumping factor = %f \n' % (int(acc), max(R_minus_one), data.jumping_factor))
                                 try:
                                     if stop_after_update:
                                         k = command_line.N
-                                        print 'Covariance matrix updated - stopping run'
+                                        print('Covariance matrix updated - stopping run')
                                 except:
                                     pass
 
@@ -734,11 +734,11 @@ def chain(cosmo, data, command_line):
                                         stop_c = True
                                         data.out.write('# After %d accepted steps: stop adapting the jumping factor at a value of %f with a local acceptance rate %f \n' % (int(acc),data.jumping_factor,np.mean(backup_ar)))
                                         if not command_line.silent:
-                                            print 'After %d accepted steps: stop adapting the jumping factor at a value of %f with a local acceptance rate of %f \n' % (int(acc), data.jumping_factor,np.mean(backup_ar))
+                                            print('After %d accepted steps: stop adapting the jumping factor at a value of %f with a local acceptance rate of %f \n' % (int(acc), data.jumping_factor,np.mean(backup_ar)))
                             jump_file.close()
 		        except:
                             if not command_line.silent:
-                                print 'Reading jumping_factor file failed'
+                                print('Reading jumping_factor file failed')
 			    pass
                 # End of slave superupdate routine
 
@@ -757,11 +757,11 @@ def chain(cosmo, data, command_line):
 				stop_c = False
                             data.out.write('# After %d accepted steps: update proposal \n' % int(acc))
                             if not command_line.silent:
-                                print 'After %d accepted steps: update proposal \n' % int(acc)
+                                print('After %d accepted steps: update proposal \n' % int(acc))
                             try:
                                 if stop_after_update:
                                     k = command_line.N
-                                    print 'Covariance matrix updated - stopping run'
+                                    print('Covariance matrix updated - stopping run')
                             except:
                                 pass
                         previous = (sigma_eig, U, C, Cholesky)

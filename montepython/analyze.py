@@ -28,9 +28,9 @@ import matplotlib.pyplot as plt
 # Module to handle warnings from matplotlib
 import warnings
 import importlib
-import io_mp
-from itertools import ifilterfalse
-from itertools import ifilter
+from . import io_mp
+from itertools import filterfalse
+
 import scipy.ndimage
 import scipy.special
 import numpy.linalg as la
@@ -109,17 +109,17 @@ def analyze(command_line):
         # compute covariance matrix, except when we are in update mode and convergence is too bad or good enough
         # or if we are in adaptive mode and only want a first guess for the covmat
         if command_line.update and (np.amax(info.R) > 3. or np.amax(info.R) < 0.4 or np.isnan(np.sum(info.R))) and not command_line.adaptive:
-            print '--> Not computing covariance matrix'
+            print('--> Not computing covariance matrix')
         else:
             try:
                 if command_line.want_covmat:
-                    print '--> Computing covariance matrix'
+                    print('--> Computing covariance matrix')
                     info.covar = compute_covariance_matrix(info)
                     # Writing it out in name_of_folder.covmat
                     io_mp.write_covariance_matrix(
                         info.covar, info.backup_names, info.cov_path)
             except:
-                print '--> Computing covariance matrix failed'
+                print('--> Computing covariance matrix failed')
                 pass
 
         # Store an array, sorted_indices, containing the list of indices
@@ -147,7 +147,7 @@ def analyze(command_line):
         # triangle and 1d plot by default.
         compute_posterior(information_instances)
 
-        print '--> Writing .info and .tex files'
+        print('--> Writing .info and .tex files')
         for info in information_instances:
             info.write_information_files()
 
@@ -189,13 +189,12 @@ def prepare(files, info):
         Used to store the result
 
     """
-
-    # First test if the folder is a MultiNest, PolyChord, CosmoHammer, or NeuralNest folder.
+    # First test if the folder is a MultiNest, PolyChord or CosmoHammer folder.
     # If so, call the module's own routine through the clean conversion
     # function, which will translate the output of this other sampling into
     # MCMC chains that can then be analyzed.
-    modules = ['MultiNest', 'PolyChord', 'cosmo_hammer', 'NeuralNest']
-    tags = ['NS', 'PC', 'CH', 'NN']
+    modules = ['MultiNest', 'PolyChord', 'cosmo_hammer','NeuralNest']
+    tags = ['NS', 'PC', 'CH','NN']
     for module_name, tag in zip(modules, tags):
         action_done = clean_conversion(module_name, tag, files[0])
         if action_done:
@@ -283,18 +282,18 @@ def convergence(info):
 
     # Store the total number of points, and the total in each chain
     total = np.zeros(len(spam)+1)
-    for j in xrange(len(spam)):
+    for j in range(len(spam)):
         total[j+1] = spam[j][:, 0].sum()
     total[0] = total[1:].sum()
 
     # Compute mean and variance for each chain
-    print '--> Computing mean values'
+    print('--> Computing mean values')
     compute_mean(mean, spam, total)
 
-    print '--> Computing variance'
+    print('--> Computing variance')
     compute_variance(var, mean, spam, total)
 
-    print '--> Computing convergence criterium (Gelman-Rubin)'
+    print('--> Computing convergence criterium (Gelman-Rubin)')
     # Gelman Rubin Diagnostic:
     # Computes a quantity linked to the ratio of the mean of the variances of
     # the different chains (within), and the variance of the means (between)
@@ -306,8 +305,8 @@ def convergence(info):
     # chains should count more
     within = 0
     between = 0
-    for i in xrange(np.shape(mean)[1]):
-        for j in xrange(len(spam)):
+    for i in range(np.shape(mean)[1]):
+        for j in range(len(spam)):
             within += total[j+1]*var[j+1, i]
             between += total[j+1]*(mean[j+1, i]-mean[0, i])**2
         within /= total[0]
@@ -315,9 +314,9 @@ def convergence(info):
 
         R[i] = between/within
         if i == 0:
-            print ' -> R-1 is %.6f' % R[i], '\tfor ', info.ref_names[i]
+            print(' -> R-1 is %.6f' % R[i], '\tfor ', info.ref_names[i])
         else:
-            print '           %.6f' % R[i], '\tfor ', info.ref_names[i]
+            print('           %.6f' % R[i], '\tfor ', info.ref_names[i])
 
     # Log finally the total number of steps, and absolute loglikelihood
     with open(info.log_path, 'a') as log:
@@ -438,9 +437,9 @@ def compute_posterior(information_instances):
                             fisher_name = line.split()[i+1].replace(',', '')
                             try:
                                 fisher_indices[i] = info.ref_names.index(fisher_name)
-                                print 'Read fisher matrix entry for parameter ',fisher_name
+                                print('Read fisher matrix entry for parameter ',fisher_name)
                             except:
-                                print 'Input fisher matrix contained unknown parameter ',fisher_name
+                                print('Input fisher matrix contained unknown parameter ',fisher_name)
                                 fisher_indices[i] = -1
                     else:
                         if fisher_indices[n] >= 0:
@@ -478,7 +477,7 @@ def compute_posterior(information_instances):
     if conf.plot_2d and not conf.plot_diag:
         for info in information_instances:
             legends[info.id]=plt.Rectangle((0,0),1,1,fc =info.MP_color_cycle[info.id][1],alpha = info.alphas[info.id],linewidth=0)
-    print '-----------------------------------------------'
+    print('-----------------------------------------------')
 
     for index, name in enumerate(plotted_parameters):
 
@@ -507,7 +506,7 @@ def compute_posterior(information_instances):
                 info.ignore_param = True
 
         # The limits might have been enforced by the user
-        if name in conf.force_limits.iterkeys():
+        if name in iter(conf.force_limits.keys()):
             x_span = conf.force_limits[name][1]-conf.force_limits[name][0]
             tick_min = conf.force_limits[name][0] +0.1*x_span
             tick_max = conf.force_limits[name][1] -0.1*x_span
@@ -522,7 +521,7 @@ def compute_posterior(information_instances):
         else:
             adjust_ticks(name, information_instances)
 
-        print ' -> Computing histograms for ', name
+        print(' -> Computing histograms for ', name)
         for info in information_instances:
             if not info.ignore_param:
 
@@ -654,7 +653,7 @@ def compute_posterior(information_instances):
                     # Execute some customisation scripts for the 1d plots
                     if (info.custom1d != []):
                         for elem in info.custom1d:
-                            execfile('plot_files/'+elem)
+                            exec(compile(open('plot_files/'+elem).read(), 'plot_files/'+elem, 'exec'))
 
                     ##################################################
                     # plot 1D posterior in 1D plot                   #
@@ -719,7 +718,7 @@ def compute_posterior(information_instances):
                         # Execute some customisation scripts for the 1d plots
                         if (info.custom1d != []):
                             for elem in info.custom1d:
-                                execfile('plot_files/'+elem)
+                                exec(compile(open('plot_files/'+elem).read(), 'plot_files/'+elem, 'exec'))
 
                         ########################################################
                         # plot 1D mean likelihood in diagonal of triangle plot #
@@ -760,8 +759,8 @@ def compute_posterior(information_instances):
                                       alpha = info.alphas[info.id])
 
                     except:
-                        print 'could not find likelihood contour for ',
-                        print info.ref_parameters[info.native_index]
+                        print('could not find likelihood contour for ', end=' ')
+                        print(info.ref_parameters[info.native_index])
 
         if conf.subplot is True:
             if conf.plot_2d and conf.plot_diag:
@@ -788,7 +787,7 @@ def compute_posterior(information_instances):
 
         # Now do the rest of the triangle plot
         if conf.plot_2d:
-            for second_index in xrange(index):
+            for second_index in range(index):
                 second_name = plotted_parameters[second_index]
                 for info in information_instances:
                     if not info.ignore_param:
@@ -862,7 +861,7 @@ def compute_posterior(information_instances):
                         # Execute some customisation scripts for the 2d contour plots
                         if (info.custom2d != []):
                            for elem in info.custom2d:
-                               execfile('plot_files/'+elem)
+                               exec(compile(open('plot_files/'+elem).read(), 'plot_files/'+elem, 'exec'))
 
                         # plotting contours, using the ctr_level method (from Karim
                         # Benabed). Note that only the 1 and 2 sigma contours are
@@ -1016,9 +1015,9 @@ def compute_posterior(information_instances):
                         info.hist_file_name, info.x_centers, info.y_centers,
                         info.extent, info.n)
 
-    print '-----------------------------------------------'
+    print('-----------------------------------------------')
     if conf.plot:
-        print '--> Saving figures to .{0} files'.format(info.extension)
+        print('--> Saving figures to .{0} files'.format(info.extension))
         plot_name = '-vs-'.join([os.path.split(elem.folder)[-1]
                                 for elem in information_instances])
 
@@ -1231,7 +1230,7 @@ def cubic_interpolation(info, hist, bincenters):
             if elem == 0.:
                 hist[i] = 1.e-99
             elif elem <0:
-                print hist[i]
+                print(hist[i])
                 raise exception()
 
         # One of our methods (using polyfit) does assume that the input histogram has a maximum value of 1.
@@ -1361,7 +1360,7 @@ def write_histogram(hist_file_name, x_centers, hist):
         hist_file.write("\n# Histogram\n")
         hist_file.write(", ".join(
             [str(elem) for elem in hist])+"\n")
-    print 'wrote ', hist_file_name
+    print('wrote ', hist_file_name)
 
 
 def read_histogram(histogram_path):
@@ -1622,7 +1621,7 @@ def extract_parameter_names(info):
                     name, array = extract_dict(line)
                     original = name
                     # Rename the names according the .extra file (opt)
-                    if name in info.to_change.iterkeys():
+                    if name in iter(info.to_change.keys()):
                         name = info.to_change[name]
                     # If the name corresponds to a varying parameter (fourth
                     # entry in the initial array being non-zero, or a derived
@@ -1650,7 +1649,7 @@ def extract_parameter_names(info):
                         # Take care of the scales
                         scale = array[4]
                         rescale = 1.
-                        if name in info.new_scales.iterkeys():
+                        if name in iter(info.new_scales.keys()):
                             rescale = info.new_scales[name]/array[4]
                         scales.append(scale)
                         rescales.append(rescale)
@@ -1704,7 +1703,7 @@ def find_maximum_of_likelihood(info):
         # This reads the chains excluding comment lines:
         with open(chain_file, 'r') as f:
             cheese = (np.array([float(line.split()[1].strip())
-                                for line in ifilterfalse(iscomment,f)]))
+                                for line in filterfalse(iscomment,f)]))
 
         try:
             min_minus_lkl.append(cheese[:].min())
@@ -1752,11 +1751,11 @@ def remove_bad_points(info):
 
         basename = os.path.basename(chain_file)
         if index == 0:
-            exec "print '--> Scanning file %-{0}s' % chain_file,".format(
-                max_name_length)
+            exec("print '--> Scanning file %-{0}s' % chain_file,".format(
+                max_name_length))
         else:
-            exec "print '%{0}s%-{1}s' % ('', basename),".format(
-                empty_length, total_length-empty_length)
+            exec("print '%{0}s%-{1}s' % ('', basename),".format(
+                empty_length, total_length-empty_length))
         # cheese will brutally contain everything in the chain chain_file being
         # scanned
         #
@@ -1767,7 +1766,7 @@ def remove_bad_points(info):
         # This read the chains excluding comment lines:
         with open(chain_file, 'r') as f:
             cheese = (np.array([[float(elem) for elem in line.split()]
-                                for line in ifilterfalse(iscomment,f)]))
+                                for line in filterfalse(iscomment,f)]))
         # If the file contains a broken line with a different number of
         # elements, the previous array generation might fail, and will not have
         # the correct shape. Hence the following command will fail. To avoid
@@ -1819,7 +1818,7 @@ def remove_bad_points(info):
             # The last of these comments gives the number of lines to be skipped in the files
             if info.markovian and not info.update:
                 with open(chain_file, 'r') as f:
-                    for line in ifilter(iscomment,f):
+                    for line in filter(iscomment,f):
                         if info.only_markovian or ('update proposal' in line):
                             start = int(line.split()[2])
                         else:
@@ -1838,16 +1837,16 @@ def remove_bad_points(info):
             if info.keep_fraction < 1:
                 start = start + int((1.-info.keep_fraction)*(line_count - start))
 
-            print ": Removed",
+            print(": Removed", end=' ')
             if info.markovian:
-                print "%d non-markovian points," % markovian,
-            print "%d points of burn-in," % burnin,
+                print("%d non-markovian points," % markovian, end=' ')
+            print("%d points of burn-in," % burnin, end=' ')
             if info.keep_fraction < 1:
-                print "and first %.0f percent," % (100.*(1-info.keep_fraction)),
-            print "keep %d steps" % (line_count-start)
+                print("and first %.0f percent," % (100.*(1-info.keep_fraction)), end=' ')
+            print("keep %d steps" % (line_count-start))
 
         except IndexError:
-            print ': Removed everything: chain not converged'
+            print(': Removed everything: chain not converged')
 
 
         # ham contains cheese without the burn-in, if there are any points
@@ -1878,10 +1877,10 @@ def remove_bad_points(info):
 
     # Applying now new rules for scales, if the name is contained in the
     # referenced names
-    for name in info.new_scales.iterkeys():
+    for name in info.new_scales.keys():
         try:
             index = info.ref_names.index(name)
-            for i in xrange(len(spam)):
+            for i in range(len(spam)):
                 spam[i][:, index+2] *= 1./info.rescales[index, index]
         except ValueError:
             # there is nothing to do if the name is not contained in ref_names
@@ -1896,8 +1895,8 @@ def remove_bad_points(info):
 def compute_mean(mean, spam, total):
     """
     """
-    for i in xrange(np.shape(mean)[1]):
-        for j in xrange(len(spam)):
+    for i in range(np.shape(mean)[1]):
+        for j in range(len(spam)):
             submean = np.sum(spam[j][:, 0]*spam[j][:, i+2])
             mean[j+1, i] = submean / total[j+1]
             mean[0, i] += submean
@@ -1907,8 +1906,8 @@ def compute_mean(mean, spam, total):
 def compute_variance(var, mean, spam, total):
     """
     """
-    for i in xrange(np.shape(var)[1]):
-        for j in xrange(len(spam)):
+    for i in range(np.shape(var)[1]):
+        for j in range(len(spam)):
             var[0, i] += np.sum(
                 spam[j][:, 0]*(spam[j][:, i+2]-mean[0, i])**2)
             var[j+1, i] = np.sum(
@@ -1921,8 +1920,8 @@ def compute_covariance_matrix(info):
     """
     """
     covar = np.zeros((len(info.ref_names), len(info.ref_names)))
-    for i in xrange(len(info.ref_names)):
-        for j in xrange(i, len(info.ref_names)):
+    for i in range(len(info.ref_names)):
+        for j in range(i, len(info.ref_names)):
             covar[i, j] = (
                 info.chain[:, 0]*(
                     (info.chain[:, i+2]-info.mean[i]) *
@@ -2078,7 +2077,7 @@ class Information(object):
         """
 
         # Assign a unique id to this instance
-        self.id = self._ids.next()
+        self.id = next(self._ids)
 
         # Defining the sigma contours (1, 2 and 3-sigma)
         self.levels = np.array([68.26, 95.4, 99.7])/100.
@@ -2116,7 +2115,7 @@ class Information(object):
         # overrides the command line options
         if command_line.optional_plot_file:
             plot_file_vars = {'info': self,'plt': plt}
-            execfile(command_line.optional_plot_file, plot_file_vars)
+            exec(compile(open(command_line.optional_plot_file).read(), command_line.optional_plot_file, 'exec'), plot_file_vars)
 
         # check and store keep_fraction
         if command_line.keep_fraction<=0 or command_line.keep_fraction>1:
@@ -2134,14 +2133,14 @@ class Information(object):
 
         """
         if hasattr(self, 'redefine'):
-            for key, value in self.redefine.iteritems():
+            for key, value in self.redefine.items():
                 # Check that the key was an original name
                 if key in self.backup_names:
-                    print ' /|\  Transforming', key, 'into', value
+                    print(' /|\  Transforming', key, 'into', value)
                     # We recover the indices of the key
                     index_to_change = self.backup_names.index(key)+2
-                    print('/_o_\ The new variable will be called ' +
-                          self.ref_names[self.backup_names.index(key)])
+                    print(('/_o_\ The new variable will be called ' +
+                          self.ref_names[self.backup_names.index(key)]))
                     # Recover all indices of all variables present in the
                     # remapping
                     variable_names = [elem for elem in self.backup_names if
@@ -2149,7 +2148,7 @@ class Information(object):
                     indices = [self.backup_names.index(name)+2 for name in
                                variable_names]
                     # Now loop over all files in spam
-                    for i in xrange(len(spam)):
+                    for i in range(len(spam)):
                         # Assign variables to their values
                         for index, name in zip(indices, variable_names):
                             exec("%s = spam[i][:, %i]" % (name, index))
@@ -2205,7 +2204,7 @@ class Information(object):
 
         # Define the bestfit array
         self.bestfit = np.zeros(len(self.ref_names))
-        for i in xrange(len(self.ref_names)):
+        for i in range(len(self.ref_names)):
             self.bestfit[i] = self.chain[self.sorted_indices[0], :][2+i]
 
         # Write down to the .h_info file all necessary information

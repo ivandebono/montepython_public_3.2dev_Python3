@@ -19,6 +19,7 @@ import re
 import argparse as ap  # Python module to handle command line arguments
 import warnings
 
+
 import io_mp
 
 
@@ -161,7 +162,7 @@ def parse_docstring(docstring, key_symbol="<**>", description_symbol="<++>"):
         msg += " as there are surrounded by '{1}"
         raise ValueError(msg.format(key_symbol, description_symbol))
 
-    helpdict = dict(zip(keys, descriptions))
+    helpdict = dict(list(zip(keys, descriptions)))
     return helpdict
 
 
@@ -189,7 +190,7 @@ def custom_help(split_string="<++>"):
         def __call__(self, parser, namespace, values, option_string=None):
 
             # create the help string and store it into a string
-            from StringIO import StringIO
+            from io import StringIO
             fstr = StringIO()
             try:
                 parser.print_help(file=fstr)
@@ -210,7 +211,7 @@ def custom_help(split_string="<++>"):
             elif option_string == '--help':
                 to_sub = r'\1\2'
 
-            print(re_desc.sub(to_sub, help_str))
+            print((re_desc.sub(to_sub, help_str)))
             parser.exit()
 
     return CustomHelp
