@@ -39,8 +39,8 @@ import warnings
 import scipy.linalg as la
 from pprint import pprint
 
-from . import io_mp
-from . import sampler
+import io_mp
+import sampler
 
 
 def get_new_position(data, eigv, U, k, Cholesky, Rotation):
@@ -272,14 +272,14 @@ def chain(cosmo, data, command_line):
                 # with # (i.e. the jumping factor adaptation was started) or not.
                 jump_value = jump_file.read().replace('# ','')
                 data.jumping_factor = float(jump_value)
-	    jump_file.close()
-	    print('rank = ',rank)
+            jump_file.close()
+            print('rank = ',rank)
         except:
-	    jump_file = open(command_line.folder + '/jumping_factor.txt','w')
-	    jump_file.write(str(data.jumping_factor))
-	    jump_file.close()
-	    rank = 0
-	    print('rank = ',rank)
+            jump_file = open(command_line.folder + '/jumping_factor.txt','w')
+            jump_file.write(str(data.jumping_factor))
+            jump_file.close()
+            rank = 0
+            print('rank = ',rank)
             starting_jumping_factor = data.jumping_factor
 
     # Recover the covariance matrix according to the input, if the varying set
@@ -419,7 +419,7 @@ def chain(cosmo, data, command_line):
         # Rescale superupdate number by cycle length N_slow + f_fast * N_fast to account for fast parameters
         command_line.superupdate *= fpm
         # Define needed parameters
-	parameter_names = data.get_mcmc_parameters(['varying'])
+        parameter_names = data.get_mcmc_parameters(['varying'])
         updated_steps = 0
         stop_c = False
         jumping_factor_rescale = 0
@@ -495,7 +495,7 @@ def chain(cosmo, data, command_line):
         # then the proposal distribution should be gradually adapted.
         # If the number of steps also exceeds the number set in adaptive_ts,
         # the jumping factor should be gradually adapted.
-	if command_line.adaptive and k>command_line.adaptive+1:
+        if command_line.adaptive and k>command_line.adaptive+1:
             # Start of adaptive routine
             # By B. Schroer and T. Brinckmann
             # Modified version of the method outlined in the PhD thesis of Marta Spinelli
@@ -538,19 +538,19 @@ def chain(cosmo, data, command_line):
             if not rank:
                 # Add the folder to the list of files to analyze, and switch on the
                 # options for computing only the covmat
-                from .parser_mp import parse
+                from parser_mp import parse
                 info_command_line = parse(
                     'info %s --minimal --noplot --keep-fraction 0.5 --keep-non-markovian --want-covmat' % command_line.folder)
                 info_command_line.update = command_line.update
 
-		if command_line.adaptive:
+                if command_line.adaptive:
                     # Keep all points for covmat guess in adaptive
                     info_command_line = parse('info %s --minimal --noplot --keep-non-markovian --want-covmat' % command_line.folder)
                     # Tell the analysis to update the covmat after t0 steps if it is adaptive
                     info_command_line.adaptive = command_line.adaptive
                     # Only compute covmat if no input covmat was provided
                     if input_covmat != None:
-			info_command_line.want_covmat = False
+                        info_command_line.want_covmat = False
 
                 # This is in order to allow for more frequent R-1 computation with superupdate
                 compute_R_minus_one = False
@@ -652,11 +652,11 @@ def chain(cosmo, data, command_line):
                                             % command_line.cov)
                             else:
                                 # Start of second part of superupdate routine
-				if command_line.superupdate:
+                                if command_line.superupdate:
                                     # Adaptation of jumping factor should start again after the covmat is updated
                                     # Save the step number after it updated for superupdate and start adaption of c again
-				    updated_steps = k
-				    stop_c = False
+                                    updated_steps = k
+                                    stop_c = False
                                     cov_det = np.linalg.det(C)
                                     prev_cov_det = np.linalg.det(previous[2])
                                     # Rescale jumping factor in order to keep the magnitude of the jumps the same.
@@ -692,14 +692,14 @@ def chain(cosmo, data, command_line):
                     command_line.quiet = True
 
                     # Start of second part of adaptive routine
-		    # Stop updating the covmat after t0 steps in adaptive
-		    if command_line.adaptive and k > 1:
+                    # Stop updating the covmat after t0 steps in adaptive
+                    if command_line.adaptive and k > 1:
                         command_line.update = 0
                         data.jumping_factor = start_jumping_factor
-			# Test if there are still enough steps left before the adaption of the jumping factor starts
-			if k > 0.5*command_line.adaptive_ts:
-			    command_line.adaptive_ts += k
-			# Set the mean for the recursion formula to the last accepted point
+                        # Test if there are still enough steps left before the adaption of the jumping factor starts
+                        if k > 0.5*command_line.adaptive_ts:
+                            command_line.adaptive_ts += k
+                        # Set the mean for the recursion formula to the last accepted point
                         for elem in parameter_names:
                             mean[parameter_names.index(elem)] = data.mcmc_parameters[elem]['last_accepted']
                     # End of second part of adaptive routine
@@ -715,9 +715,9 @@ def chain(cosmo, data, command_line):
                     if abs(np.mean(backup_ar) - command_line.superupdate_ar) > 5.*command_line.superupdate_ar_tol:
                         stop_c = False
 
-		    # Update the jumping factor every 5 steps in superupdate
-		    if not k % 5 and k > command_line.superupdate and command_line.superupdate and (not stop_c or (stop_c and k % command_line.update)):
-		        try:
+                    # Update the jumping factor every 5 steps in superupdate
+                    if not k % 5 and k > command_line.superupdate and command_line.superupdate and (not stop_c or (stop_c and k % command_line.update)):
+                        try:
                             jump_file = open(command_line.folder + '/jumping_factor.txt','r')
                             # If there is a # in the file, the master has stopped adapting c
                             for line in jump_file:
@@ -736,10 +736,10 @@ def chain(cosmo, data, command_line):
                                         if not command_line.silent:
                                             print('After %d accepted steps: stop adapting the jumping factor at a value of %f with a local acceptance rate of %f \n' % (int(acc), data.jumping_factor,np.mean(backup_ar)))
                             jump_file.close()
-		        except:
+                        except:
                             if not command_line.silent:
                                 print('Reading jumping_factor file failed')
-			    pass
+                            pass
                 # End of slave superupdate routine
 
                 # Start of slave update routine
@@ -752,9 +752,9 @@ def chain(cosmo, data, command_line):
                         # Test here whether the covariance matrix has really changed
                         # We should in principle test all terms, but testing the first one should suffice
                         if not C[0,0] == previous[2][0,0] and not k == 1:
-			    if command_line.superupdate:
+                            if command_line.superupdate:
                                 # If the covmat was updated, the master has resumed adapting c
-				stop_c = False
+                                stop_c = False
                             data.out.write('# After %d accepted steps: update proposal \n' % int(acc))
                             if not command_line.silent:
                                 print('After %d accepted steps: update proposal \n' % int(acc))
@@ -781,7 +781,7 @@ def chain(cosmo, data, command_line):
         else:  # reject step
             rej += 1
             if command_line.superupdate:
-	        ar[k%len(ar)] = 0 # Local acceptance rate of last SU*(N_slow + f_fast * N_fast) steps
+                        ar[k%len(ar)] = 0 # Local acceptance rate of last SU*(N_slow + f_fast * N_fast) steps
             elif command_line.adaptive:
                 ar[k%len(ar)] = 0 # Local acceptance rate of last 100 steps
             N += 1
@@ -814,14 +814,14 @@ def chain(cosmo, data, command_line):
             acc += 1.0
             N = 1  # Reset the multiplicity
             if command_line.superupdate:
-	        ar[k%len(ar)] = 1 # Local acceptance rate of last SU*(N_slow + f_fast * N_fast) steps
+                ar[k%len(ar)] = 1 # Local acceptance rate of last SU*(N_slow + f_fast * N_fast) steps
             elif command_line.adaptive:
                 ar[k%len(ar)] = 1 # Local acceptance rate of last 100 steps
         else:  # reject step
             rej += 1.0
             N += 1  # Increase multiplicity of last accepted point
             if command_line.superupdate:
-	        ar[k%len(ar)] = 0 # Local acceptance rate of last SU*(N_slow + f_fast * N_fast) steps
+                ar[k%len(ar)] = 0 # Local acceptance rate of last SU*(N_slow + f_fast * N_fast) steps
             elif command_line.adaptive:
                 ar[k%len(ar)] = 0 # Local acceptance rate of last 100 steps
 

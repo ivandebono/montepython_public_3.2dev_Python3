@@ -23,7 +23,7 @@ from __future__ import print_function
 import numpy as np
 import sys
 import warnings
-from . import io_mp
+import io_mp
 import os
 import scipy.linalg as la
 import scipy.optimize as op
