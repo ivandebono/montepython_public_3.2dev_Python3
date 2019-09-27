@@ -61,7 +61,6 @@ class Likelihood(object):
         # Recover the values potentially read in the input.param file.
         if hasattr(data, self.name):
             exec("global attributes; attributes = [e for e in dir(data.{}) if e.find('__') == -1]".format(self.name))
-            print('ATTRIBUTES',attributes)
             for elem in attributes:
                 exec("setattr(self, elem, getattr(data.{}, elem))".format(self.name))
 

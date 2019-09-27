@@ -768,7 +768,7 @@ def compute_lkl(cosmo, data):
     # imaginary number i.
     flag_wrote_fiducial = 0
 
-    for likelihood in data.lkl.itervalues():
+    for likelihood in data.lkl.values():
         if likelihood.need_update is True:
             value = likelihood.loglkl(cosmo, data)
             # Storing the result
