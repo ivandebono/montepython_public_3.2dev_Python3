@@ -372,9 +372,9 @@ def from_NS_output_to_chains(folder):
     columns_reorder = [NS_param_names.index(param) for param in param_names]
 
     # Open the 'stats.dat' file to see what happened and retrieve some info
-    stats_file = open(base_name+name_stats, 'r')
-    lines = stats_file.readlines()
-    stats_file.close()
+    with open(base_name+name_stats, 'r') as stats_file: 
+        lines = stats_file.readlines()
+    
     # Mode-separated info
     i = 0
     n_modes = 0
