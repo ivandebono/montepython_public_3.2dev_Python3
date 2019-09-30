@@ -9,10 +9,6 @@ Whenever the arguments of the functions are :code:`command_line` or
 :code:`data`, no mention of them will be done - as it is now clear. On the
 contrary, if there are more arguments, they will be detailled.
 
-This module also defines a new class :class:`File`, that extends
-:py:class:`file`, which provides a tail function. It is used in
-:func:`sampler.read_args_from_chain`.
-
 Finally, the way the error messages are displayed is set there, along with
 ascii-art for the exclamation mark sign.
 """
@@ -449,35 +445,21 @@ def safe_exec(string):
     """Attempt at executing a string from file in a secure way"""
     exec(string, {'__builtins__': {}})
 
-## Modified by Ivan Debono
-## for compatibility with Python 3
-class cfile():
-    def file():
-        return open(file)
-#########
-
-class File(cfile):   #This line modified by Ivan Debono
-    """
-    New class of file, to provide an equivalent of the tail command (on linux).
-
-    It will be used when starting from an existing chain, and avoids circling
-    through an immense file.
-    """
-
-    def tail(self, lines_2find=1):
-        """Imitates the classic tail command"""
-        self.seek(0, 2)     # go to end of file
-        bytes_in_file = self.tell()
-        lines_found, total_bytes_scanned = 0, 0
-        while (lines_2find+1 > lines_found and
-                bytes_in_file > total_bytes_scanned):
-            byte_block = min(1024, bytes_in_file-total_bytes_scanned)
-            self.seek(-(byte_block+total_bytes_scanned), 2)
-            total_bytes_scanned += byte_block
-            lines_found += self.read(1024).count('\n')
-        self.seek(-total_bytes_scanned, 2)
-        line_list = list(self.readlines())
-        return line_list[-lines_2find:]
+            
+def tail(self, lines_2find=1):
+    """Imitates the classic tail command"""
+    self.seek(0, os.SEEK_END)     # go to end of file
+    bytes_in_file = self.tell()
+    lines_found, total_bytes_scanned = 0, 0
+    while (lines_2find+1 > lines_found and
+            bytes_in_file > total_bytes_scanned):
+        byte_block = min(1024, bytes_in_file-total_bytes_scanned)   
+        self.seek(self.tell()-(byte_block+total_bytes_scanned), os.SEEK_SET)
+        total_bytes_scanned += byte_block
+        lines_found += self.read(1024).count('\n')
+    self.seek(self.tell()-total_bytes_scanned,os.SEEK_SET)
+    line_list = list(self.readlines())
+    return line_list[-lines_2find:]
 
 
 class LockError(Exception):
