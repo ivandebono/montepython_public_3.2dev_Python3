@@ -3,12 +3,12 @@ import os
 from copy import copy
 import warnings
 import glob
-from . import io_mp
+import io_mp
 
 import numpy as np
 import pandas as pd
 
-from . import sampler
+import sampler
 
 from nnest import NestedSampler, MCMCSampler
 

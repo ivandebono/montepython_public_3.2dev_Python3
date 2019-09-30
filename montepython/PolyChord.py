@@ -22,8 +22,8 @@ import numpy as np
 import os
 from copy import copy
 import warnings
-from . import io_mp
-from . import sampler
+import io_mp
+import sampler
 
 # Data on file names and PolyChord options, that may be called by other modules
 

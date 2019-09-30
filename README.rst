@@ -91,6 +91,13 @@ Prerequisites
 * *[optional]* You can now use Multi Nest and the CosmoHammer with Monte
   Python, though you need to install them. Please refer to the documentation.
 
+* On CC-in2p3 cluster:
+Load Python 3 with $ ccenv Python 3.6.7
+Polychord requires GLIBCXX_3.4.21. This must be loaded with:
+$ ccenv anaconda 3.6
+followed by
+$ ccenv Python 3.6.7
+
 
 The MontePython part
 --------------------
