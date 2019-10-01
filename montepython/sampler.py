@@ -61,6 +61,9 @@ def run(cosmo, data, command_line):
     elif command_line.method == 'Der':
         import add_derived as der
         der.run(cosmo, data, command_line)
+    elif command_line.method == 'NN':
+        import NeuralNest as nn
+        nn.run(cosmo, data, command_line)
     elif command_line.method == 'Fisher':
         command_line.fisher = True
         import mcmc

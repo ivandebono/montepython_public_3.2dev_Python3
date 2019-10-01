@@ -7,7 +7,7 @@ output files), you only have to find the called function and change a number.
 
 Whenever the arguments of the functions are :code:`command_line` or
 :code:`data`, no mention of them will be done - as it is now clear. On the
-contrary, if there are more arguments, they will be detailled.
+contrary, if there are more arguments, they will be detailed.
 
 Finally, the way the error messages are displayed is set there, along with
 ascii-art for the exclamation mark sign.
@@ -65,10 +65,10 @@ def log_likelihood_parameters(likelihood, command_line):
         log.write("\n\n#-----Likelihood-{0}-----\n".format(likelihood.name))
         for key, value in likelihood.dictionary.items():
             if type(value) != type(''):
-                log.write("%s.%s = %s\n" % (
+                log.write("{}.{} = {}\n".format(
                     likelihood.name, key, value))
             else:
-                log.write("%s.%s = '%s'\n" % (
+                log.write("{}.{} = '{}'\n".format(
                     likelihood.name, key, value))
     #for line in tolog:
         #log.write(line)
@@ -266,12 +266,12 @@ def create_output_files(command_line, data):
                 suffix += 1
         data.out_name = os.path.join(
             command_line.folder, outname_base)+str(suffix)+'.txt'
-        print('Creating %s\n' % data.out_name)
+        print('Creating {}\n'.format(data.out_name))
     else:
         data.out_name = os.path.join(
             command_line.folder, outname_base)+command_line.chain_number+'.txt'
         data.out = open(data.out_name, 'w')
-        print('Creating %s\n' % data.out_name)
+        print('Creating {}\n'.format(data.out_name))
     # in case of a restart, copying the whole thing in the new file
     if command_line.restart is not None:
         # Construct filename of old chain from input.

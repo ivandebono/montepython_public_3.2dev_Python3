@@ -86,7 +86,7 @@ def mpi_run(custom_command=""):
         if not custom_command:
             custom_command = " ".join(sys.argv[1:])
         if rank != 0:
-            custom_command += " --chain-number %s" % str(int(number)+1)
+            custom_command += " --chain-number {}" .format(str(int(number)+1))
 
         # First check if the folder is there
         already_sent = False
@@ -121,7 +121,7 @@ def mpi_run(custom_command=""):
                 status = 1
             else:
                 warnings.warn(
-                    "The method '%s' is not supported"%(command_line.method) +
+                    "The method '{}' is not supported".format(command_line.method) +
                     " in mpirun so this will run on one core only.")
                 status = 'failed'
             folder = data.out_name

@@ -4,10 +4,8 @@ from copy import copy
 import warnings
 import glob
 import io_mp
-
 import numpy as np
 import pandas as pd
-
 import sampler
 
 from nnest import NestedSampler, MCMCSampler
@@ -73,7 +71,8 @@ NN_user_arguments = {
     # MCMC sampler options
     'bootstrap_fileroot':
         {'help': 'Bootstrap chain fileroot',
-         'type': str}
+         'type': str,
+         'default' : None}
     }
 
 
@@ -86,6 +85,7 @@ def initialise(cosmo, data, command_line):
     # Convenience variables
     varying_param_names = data.get_mcmc_parameters(['varying'])
     derived_param_names = data.get_mcmc_parameters(['derived'])
+    
 
     if getattr(command_line, NN_prefix+'sampler', '').lower() == 'nested':
 
@@ -102,14 +102,14 @@ def initialise(cosmo, data, command_line):
                 'parameters. Set reasonable bounds for them in the ".param"' +
                 'file.')
 
-    # If absent, create the sub-folder NS
+    # If absent, create the sub-folder NN
     NN_folder = os.path.join(command_line.folder, NN_subfolder)
     if not os.path.exists(NN_folder):
         os.makedirs(NN_folder)
 
     run_num = sum(os.path.isdir(os.path.join(NN_folder,i)) for i in os.listdir(NN_folder)) + 1
 
-    print(('run_num', run_num))
+    print('run_num', run_num)
 
     # -- Automatic arguments
     data.NN_arguments['x_dim'] = len(varying_param_names)
@@ -121,20 +121,25 @@ def initialise(cosmo, data, command_line):
     data.NN_arguments['load_model'] = ''
     data.NN_arguments['batch_size'] = 100
 
-    if getattr(command_line, NN_prefix+'fastslow'):
+
+    if getattr(command_line, NN_prefix+'fastslow',NN_user_arguments['fastslow']['default']) == True:
         data.NN_arguments['num_slow'] = data.block_parameters[0]
     else:
         data.NN_arguments['num_slow'] = 0
 
     # -- User-defined arguments
     for arg in NN_user_arguments:
-        value = getattr(command_line, NN_prefix+arg)
+        #print(arg)
+        value=getattr(command_line, NN_prefix+arg) # ),NN_user_arguments[arg]['default'])
+        #value = getattr(command_line, NN_prefix+arg)
         data.NN_arguments[arg] = value
+        #print(value)
         if arg == 'switch':
             if value >= 0:
                 data.NN_arguments['switch'] = value
             elif data.NN_arguments['num_slow'] > 0:
                 data.NN_arguments['switch'] = 1.0 / (5 * data.NN_arguments['num_slow'])
+
 
     if getattr(command_line, NN_prefix + 'sampler', '').lower() == 'mcmc':
         data.NN_arguments['mcmc_steps'] = getattr(command_line, 'N')
@@ -248,7 +253,7 @@ def run(cosmo, data, command_line):
                     logl = sampler.compute_lkl(cosmo, data)
                     if not np.isfinite(logl):
                         print('Nan encountered in likelihood')
-                        print((data.mcmc_parameters))
+                        print(data.mcmc_parameters)
                 else:
                     logl = data.boundary_loglike
                 logls.append(logl)

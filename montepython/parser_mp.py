@@ -381,7 +381,7 @@ def create_parser():
             can be set to 'NS' for MultiNest (using Multinest wrapper
             PyMultiNest), 'PC' for PolyChord (using PolyChord wrapper
             PyPolyChord), 'CH' for Cosmo Hammer (using the Cosmo Hammer wrapper
-            to emcee algorithm), and finally 'IS' for importance sampling.
+            to emcee algorithm), 'IS' for importance sampling, or 'NN' for NeuralNest.
 
             Note that when running with Importance sampling, you need to
             specify a folder to start from.<++>
@@ -740,7 +740,7 @@ def create_parser():
     # -- sampling method (OPTIONAL)
     runparser.add_argument('-m', '--method', help=helpdict['m'],
                            dest='method', default='MH',
-                           choices=['MH', 'NS', 'PC', 'CH', 'IS', 'Der', 'Fisher'])
+                           choices=['MH', 'NS', 'PC', 'CH', 'IS', 'Der', 'Fisher', 'NN'])
     # -- update Metropolis Hastings (OPTIONAL)
     runparser.add_argument('--update', help=helpdict['update'], type=int,
                            dest='update', default=50)
@@ -909,6 +909,26 @@ def create_parser():
     except:
         warnings.warn('CosmoHammer detected but emcee likely not installed correctly. '
                       'You can safely ignore this if not running with option -m CH')
+
+    ###############
+    # NeuralNest arguments (all OPTIONAL and ignored if not "-m=NN")
+    try:
+        with suppress_stdout():
+            from NeuralNest import NN_prefix, NN_user_arguments
+        NNparser = runparser.add_argument_group(
+            title="NeuralNest",
+            description="Run the MCMC chains using NeuralNest"
+            )
+        for arg in NN_user_arguments:
+            NNparser.add_argument('--'+NN_prefix+arg,
+                                  **NN_user_arguments[arg])
+    except ImportError:
+        # Not defined if not installed
+        pass
+    except:
+        warnings.warn('NeuralNest detected but likely not installed correctly. '
+                      'You can safely ignore this if not running with option -m NN')
+
 
     ###############
     # Information

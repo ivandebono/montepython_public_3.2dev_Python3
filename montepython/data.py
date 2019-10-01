@@ -178,6 +178,17 @@ class Data(object):
         :rtype: dict
         """
 
+        # Arguments for NeuralNest 
+        self.NN_param_names = []
+        self.NN_arguments = {}
+        """
+        Dictionary containing the parameters needed by the NeuralNest sampler.
+        It is filled just before the run of the sampler.  Those parameters not
+        defined will be set to the default value of NeuralNest.
+
+        :rtype: dict
+        """
+
         # Initialise the experiments attribute
         self.experiments = []
 
