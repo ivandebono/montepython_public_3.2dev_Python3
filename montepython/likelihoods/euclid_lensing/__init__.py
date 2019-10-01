@@ -39,9 +39,9 @@ class euclid_lensing(Likelihood):
         if (self.use_halofit):
             self.need_cosmo_arguments(data, {'non linear':'halofit'})
 
-	# Warn if theoretical error and linear cutoff are requested
-	if (self.use_lmax_lincut and self.theoretical_error!=0):
-	    warnings.warn("A lmax cutoff infered from kmax and a theoretical error are requested. This combination is not implemented and in most cases not necessary as the theoretical error should induce a cutoff by itself.")
+        # Warn if theoretical error and linear cutoff are requested
+        if (self.use_lmax_lincut and self.theoretical_error!=0):
+            warnings.warn("A lmax cutoff infered from kmax and a theoretical error are requested. This combination is not implemented and in most cases not necessary as the theoretical error should induce a cutoff by itself.")
 
         # Define array of l values, and initialize them
         # It is a logspace
@@ -71,8 +71,8 @@ class euclid_lensing(Likelihood):
         # first value is already correctly set to 0.
         self.z_bin_edge = np.zeros(self.nbin+1, 'float64')
 
-	total_count = 0.
-        for Bin in xrange(self.nbin-1):
+        total_count = 0.
+        for Bin in range(self.nbin-1):
             bin_count = 0.
             z = self.z_bin_edge[Bin]
             while (bin_count <= (n_tot-total_count)/(self.nbin-Bin)):
@@ -81,7 +81,7 @@ class euclid_lensing(Likelihood):
                 bin_count += 0.5*(gd_1+gd_2)*self.dz
                 z += self.dz
             self.z_bin_edge[Bin+1] = z
-	    total_count += bin_count
+            total_count += bin_count
         self.z_bin_edge[self.nbin] = self.zmax
 
         # Fill array of discrete z values
@@ -90,10 +90,10 @@ class euclid_lensing(Likelihood):
         # Fill distribution for each bin (convolving with photo_z distribution)
         self.eta_z = np.zeros((self.nzmax, self.nbin), 'float64')
         gal = self.galaxy_distribution(self.z, True)
-        for Bin in xrange(self.nbin):
+        for Bin in range(self.nbin):
             low = self.z_bin_edge[Bin]
             hig = self.z_bin_edge[Bin+1]
-            for nz in xrange(self.nzmax):
+            for nz in range(self.nzmax):
                 z = self.z[nz]
                 integrand = gal*self.photo_z_distribution(z, self.z, True)
                 integrand = np.array([
@@ -105,7 +105,7 @@ class euclid_lensing(Likelihood):
 
         # integrate eta(z) over z (in view of normalizing it to one)
         self.eta_norm = np.zeros(self.nbin, 'float64')
-        for Bin in xrange(self.nbin):
+        for Bin in range(self.nbin):
             self.eta_norm[Bin] = np.sum(0.5*(
                 self.eta_z[1:, Bin]+self.eta_z[:-1, Bin])*(
                 self.z[1:]-self.z[:-1]))
@@ -211,30 +211,30 @@ class euclid_lensing(Likelihood):
         # g_i(r) = 2r(1+z(r)) int_r^+\infty drs eta_r(rs) (rs-r)/rs
         # The integration starts from r.
         g = np.zeros((self.nzmax, self.nbin), 'float64')
-        for Bin in xrange(self.nbin):
-            for nr in xrange(1, self.nzmax-1):
+        for Bin in range(self.nbin):
+            for nr in range(1, self.nzmax-1):
                 fun = self.eta_r[nr:, Bin]*(self.r[nr:]-self.r[nr])/self.r[nr:]
                 g[nr, Bin] = np.sum(0.5*(
                     fun[1:]+fun[:-1])*(self.r[nr+1:]-self.r[nr:-1]))
                 g[nr, Bin] *= 2.*self.r[nr]*(1.+self.z[nr])
 
-	# compute the maximum l where most contributions are linear
-	# as a function of the lower bin number
-	if self.use_lmax_lincut:
+        # compute the maximum l where most contributions are linear
+        # as a function of the lower bin number
+        if self.use_lmax_lincut:
             lintegrand_lincut_o = np.zeros((self.nzmax, self.nbin, self.nbin), 'float64')
             lintegrand_lincut_u = np.zeros((self.nzmax, self.nbin, self.nbin), 'float64')
             l_lincut = np.zeros((self.nbin, self.nbin), 'float64')
             l_lincut_mean = np.zeros(self.nbin, 'float64')
-            for Bin1 in xrange(self.nbin):
-                for Bin2 in xrange(Bin1,self.nbin):
+            for Bin1 in range(self.nbin):
+                for Bin2 in range(Bin1,self.nbin):
                     lintegrand_lincut_o[1:,Bin1, Bin2] = g[1:, Bin1]*g[1:, Bin2]/(
                         self.r[1:])
-            for Bin1 in xrange(self.nbin):
-                for Bin2 in xrange(Bin1,self.nbin):
+            for Bin1 in range(self.nbin):
+                for Bin2 in range(Bin1,self.nbin):
                     lintegrand_lincut_u[1:,Bin1, Bin2] = g[1:, Bin1]*g[1:, Bin2]/(
                         self.r[1:]**2)
-            for Bin1 in xrange(self.nbin):
-                for Bin2 in xrange(Bin1,self.nbin):
+            for Bin1 in range(self.nbin):
+                for Bin2 in range(Bin1,self.nbin):
                     l_lincut[Bin1, Bin2] = np.sum(0.5*(
                         lintegrand_lincut_o[1:, Bin1, Bin2] +
                         lintegrand_lincut_o[:-1, Bin1, Bin2])*(
@@ -243,33 +243,33 @@ class euclid_lensing(Likelihood):
                         lintegrand_lincut_u[1:, Bin1, Bin2] +
                         lintegrand_lincut_u[:-1, Bin1, Bin2])*(
                         self.r[1:]-self.r[:-1]))
-	    z_peak = np.zeros((self.nbin, self.nbin), 'float64')
-            for Bin1 in xrange(self.nbin):
-                for Bin2 in xrange(Bin1,self.nbin):
-	    	    z_peak[Bin1, Bin2] = self.zmax
-                    for index_z in xrange(self.nzmax):
-			if (self.r[index_z]>l_lincut[Bin1, Bin2]):
-			    z_peak[Bin1, Bin2] = self.z[index_z]
-			    break
+            z_peak = np.zeros((self.nbin, self.nbin), 'float64')
+            for Bin1 in range(self.nbin):
+                for Bin2 in range(Bin1,self.nbin):
+                    z_peak[Bin1, Bin2] = self.zmax
+                    for index_z in range(self.nzmax):
+                        if (self.r[index_z]>l_lincut[Bin1, Bin2]):
+                            z_peak[Bin1, Bin2] = self.z[index_z]
+                            break
                     if self.use_zscaling:
-		        l_lincut[Bin1, Bin2] *= self.kmax_hMpc*cosmo.h()*pow(1.+z_peak[Bin1, Bin2],2./(2.+cosmo.n_s()))
+                        l_lincut[Bin1, Bin2] *= self.kmax_hMpc*cosmo.h()*pow(1.+z_peak[Bin1, Bin2],2./(2.+cosmo.n_s()))
                     else:
-		        l_lincut[Bin1, Bin2] *= self.kmax_hMpc*cosmo.h()
-		l_lincut_mean[Bin1] = np.sum(l_lincut[Bin1, :])/(self.nbin-Bin1)
+                        l_lincut[Bin1, Bin2] *= self.kmax_hMpc*cosmo.h()
+                l_lincut_mean[Bin1] = np.sum(l_lincut[Bin1, :])/(self.nbin-Bin1)
 
-	    #for Bin1 in xrange(self.nbin):
-	        #for Bin2 in xrange(Bin1,self.nbin):
-		    #print("%s\t%s\t%s\t%s" % (Bin1, Bin2, l_lincut[Bin1, Bin2], l_lincut_mean[Bin1]))
+            #for Bin1 in range(self.nbin):
+                #for Bin2 in range(Bin1,self.nbin):
+                    #print("%s\t%s\t%s\t%s" % (Bin1, Bin2, l_lincut[Bin1, Bin2], l_lincut_mean[Bin1]))
 
-	#for nr in xrange(1, self.nzmax-1):
-	#	print("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (self.z[nr], g[nr, 0], g[nr, 1], g[nr, 2], g[nr, 3], g[nr, 4], g[nr, 5], g[nr, 6], g[nr, 7], g[nr, 8], g[nr, 9]))
+                #for nr in range(1, self.nzmax-1):
+                #print("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (self.z[nr], g[nr, 0], g[nr, 1], g[nr, 2], g[nr, 3], g[nr, 4], g[nr, 5], g[nr, 6], g[nr, 7], g[nr, 8], g[nr, 9]))
 
         # Get power spectrum P(k=l/r,z(r)) from cosmological module
         kmin_in_inv_Mpc = self.k_min_h_by_Mpc * cosmo.h()
         kmax_in_inv_Mpc = self.k_max_h_by_Mpc * cosmo.h()
         pk = np.zeros((self.nlmax, self.nzmax), 'float64')
-        for index_l in xrange(self.nlmax):
-            for index_z in xrange(1, self.nzmax):
+        for index_l in range(self.nlmax):
+            for index_z in range(1, self.nzmax):
 
         # These lines would return an error when you ask for P(k,z) out of computed range
         #        if (self.l[index_l]/self.r[index_z] > self.k_max):
@@ -285,7 +285,7 @@ class euclid_lensing(Likelihood):
                 else:
                     pk[index_l, index_z] = cosmo.pk(self.l[index_l]/self.r[index_z], self.z[index_z])
 
-		#print("%s\t%s\t%s" %(self.l[index_l], self.z[index_z], pk[index_l, index_z]))
+                #print("%s\t%s\t%s" %(self.l[index_l], self.z[index_z], pk[index_l, index_z]))
 
         # Recover the non_linear scale computed by halofit. If no scale was
         # affected, set the scale to one, and make sure that the nuisance
@@ -296,16 +296,16 @@ class euclid_lensing(Likelihood):
         else:
             k_sigma = cosmo.nonlinear_scale(self.z, self.nzmax)
 
-	# replace unphysical values of k_sigma
-	if not (cosmo.nonlinear_method == 0):
-	    k_sigma_problem = False
-	    for index_z in xrange(self.nzmax-1):
-	        if (k_sigma[index_z+1]<k_sigma[index_z]) or (k_sigma[index_z+1]>2.5):
-	            k_sigma[index_z+1] = 2.5
-	            k_sigma_problem = True
-	        #print("%s\t%s" % (k_sigma[index_z], self.z[index_z]))
-	    if k_sigma_problem:
-	        warnings.warn("There were unphysical (decreasing in redshift or exploding) values of k_sigma (=cosmo.nonlinear_scale(...)). To proceed they were set to 2.5, the highest scale that seems to be stable.")
+        # replace unphysical values of k_sigma
+        if not (cosmo.nonlinear_method == 0):
+            k_sigma_problem = False
+            for index_z in range(self.nzmax-1):
+                if (k_sigma[index_z+1]<k_sigma[index_z]) or (k_sigma[index_z+1]>2.5):
+                    k_sigma[index_z+1] = 2.5
+                    k_sigma_problem = True
+                #print("%s\t%s" % (k_sigma[index_z], self.z[index_z]))
+            if k_sigma_problem:
+                warnings.warn("There were unphysical (decreasing in redshift or exploding) values of k_sigma (=cosmo.nonlinear_scale(...)). To proceed they were set to 2.5, the highest scale that seems to be stable.")
 
         # Define the alpha function, that will characterize the theoretical
         # uncertainty. Chosen to be 0.001 at low k, raise between 0.1 and 0.2
@@ -317,8 +317,8 @@ class euclid_lensing(Likelihood):
                 #k = self.l[index_l]/self.r[1:]
                 #alpha[index_l, 1:] = np.log(1.+k[:]/k_sigma[1:])/(
                     #1.+np.log(1.+k[:]/k_sigma[1:]))*self.theoretical_error
-            for index_l in xrange(self.nlmax):
-             for index_z in xrange(1, self.nzmax):
+            for index_l in range(self.nlmax):
+             for index_z in range(1, self.nzmax):
                 k = self.l[index_l]/self.r[index_z]
                 alpha[index_l, index_z] = np.log(1.+k/k_sigma[index_z])/(
                     1.+np.log(1.+k/k_sigma[index_z]))*self.theoretical_error
@@ -350,11 +350,11 @@ class euclid_lensing(Likelihood):
                                     'float64')
             El = np.zeros((self.nlmax, self.nbin, self.nbin), 'float64')
 
-        for nl in xrange(self.nlmax):
+        for nl in range(self.nlmax):
 
             # find Cl_integrand = (g(r) / r)**2 * P(l/r,z(r))
-            for Bin1 in xrange(self.nbin):
-                for Bin2 in xrange(Bin1,self.nbin):
+            for Bin1 in range(self.nbin):
+                for Bin2 in range(Bin1,self.nbin):
                     Cl_integrand[1:, Bin1, Bin2] = g[1:, Bin1]*g[1:, Bin2]/(
                         self.r[1:]**2)*pk[nl, 1:]
                     if self.theoretical_error != 0:
@@ -367,8 +367,8 @@ class euclid_lensing(Likelihood):
             # g_j(r) /r**2) P(k=l/r,z(r))
             # It it then multiplied by 9/16*Omega_m**2 to be in units of Mpc**4
             # and then by (h/2997.9)**4 to be dimensionless
-            for Bin1 in xrange(self.nbin):
-                for Bin2 in xrange(Bin1,self.nbin):
+            for Bin1 in range(self.nbin):
+                for Bin2 in range(Bin1,self.nbin):
                     Cl[nl, Bin1, Bin2] = np.sum(0.5*(
                         Cl_integrand[1:, Bin1, Bin2] +
                         Cl_integrand[:-1, Bin1, Bin2])*(
@@ -393,7 +393,7 @@ class euclid_lensing(Likelihood):
                 self.data_directory, self.fiducial_file)
             with open(fid_file_path, 'w') as fid_file:
                 fid_file.write('# Fiducial parameters')
-                for key, value in data.mcmc_parameters.iteritems():
+                for key, value in data.mcmc_parameters.items():
                     fid_file.write(
                         ', %s = %.5g' % (key, value['current']*value['scale']))
                 fid_file.write('\n')
@@ -401,7 +401,7 @@ class euclid_lensing(Likelihood):
                     for Bin1 in range(self.nbin):
                         for Bin2 in range(self.nbin):
                             fid_file.write("%.8g\n" % Cl[nl, Bin1, Bin2])
-            print '\n'
+            print('\n')
             warnings.warn(
                 "Writing fiducial model in %s, for %s likelihood\n" % (
                     self.data_directory+'/'+self.fiducial_file, self.name))
@@ -413,8 +413,8 @@ class euclid_lensing(Likelihood):
 
         # Spline Cl[nl,Bin1,Bin2] along l
         spline_Cl = np.empty((self.nbin, self.nbin), dtype=(list, 3))
-        for Bin1 in xrange(self.nbin):
-            for Bin2 in xrange(Bin1, self.nbin):
+        for Bin1 in range(self.nbin):
+            for Bin2 in range(Bin1, self.nbin):
                 spline_Cl[Bin1, Bin2] = list(itp.splrep(
                     self.l, Cl[:, Bin1, Bin2]))
                 if Bin2 > Bin1:
@@ -423,8 +423,8 @@ class euclid_lensing(Likelihood):
         # Spline El[nl,Bin1,Bin2] along l
         if self.theoretical_error != 0:
             spline_El = np.empty((self.nbin, self.nbin), dtype=(list, 3))
-            for Bin1 in xrange(self.nbin):
-                for Bin2 in xrange(Bin1, self.nbin):
+            for Bin1 in range(self.nbin):
+                for Bin2 in range(Bin1, self.nbin):
                     spline_El[Bin1, Bin2] = list(itp.splrep(
                         self.l, El[:, Bin1, Bin2]))
                     if Bin2 > Bin1:
@@ -432,8 +432,8 @@ class euclid_lensing(Likelihood):
 
         # Spline Cl_fid[nl,Bin1,Bin2]    along l
         spline_Cl_fid = np.empty((self.nbin, self.nbin), dtype=(list, 3))
-        for Bin1 in xrange(self.nbin):
-            for Bin2 in xrange(Bin1, self.nbin):
+        for Bin1 in range(self.nbin):
+            for Bin2 in range(Bin1, self.nbin):
                 spline_Cl_fid[Bin1, Bin2] = list(itp.splrep(
                     self.l, self.Cl_fid[:, Bin1, Bin2]))
                 if Bin2 > Bin1:
@@ -453,8 +453,8 @@ class euclid_lensing(Likelihood):
         Cov_observ = np.zeros((len(ells), self.nbin, self.nbin), 'float64')
         Cov_error = np.zeros((len(ells), self.nbin, self.nbin), 'float64')
 
-        for Bin1 in xrange(self.nbin):
-            for Bin2 in xrange(Bin1, self.nbin):
+        for Bin1 in range(self.nbin):
+            for Bin2 in range(Bin1, self.nbin):
                 Cov_theory[:, Bin1, Bin2] = itp.splev(
                     ells, spline_Cl[Bin1, Bin2])
                 Cov_observ[:, Bin1, Bin2] = itp.splev(
@@ -472,9 +472,9 @@ class euclid_lensing(Likelihood):
         # TODO parallelize this
         for index, ell in enumerate(ells):
 
-	    if self.use_lmax_lincut:
+            if self.use_lmax_lincut:
                 CutBin = -1
-                for zBin in xrange(self.nbin):
+                for zBin in range(self.nbin):
                     if (ell<l_lincut_mean[zBin]):
                         CutBin = zBin
                         det_theory = np.linalg.det(Cov_theory[index, CutBin:, CutBin:])
@@ -482,7 +482,7 @@ class euclid_lensing(Likelihood):
                         break
                 if (CutBin==-1):
                     break
-	    else:
+            else:
                 det_theory = np.linalg.det(Cov_theory[index, :, :])
                 det_observ = np.linalg.det(Cov_observ[index, :, :])
 
@@ -517,14 +517,14 @@ class euclid_lensing(Likelihood):
                             newCov[:, i] = Cov_observ[index,:, i]#MArchi#newCov[:, i] = Cov_observ[:, i]
                             det_theory_plus_error_cross_obs += np.linalg.det(
                                 newCov)
-			try:
-                        	function_vector[k] = (2.*ell+1.)*self.fsky*(det_theory_plus_error_cross_obs/det_theory_plus_error + math.log(det_theory_plus_error/det_observ) - self.nbin ) + dof*vector[k]**2
-			except ValueError:
-				warnings.warn("Euclid_lensing: Could not evaluate chi2 including theoretical error with the current parameters. The corresponding chi2 is now set to nan!")
-				break
-				break
-				break
-				chi2 = np.nan
+                    try:
+                        function_vector[k] = (2.*ell+1.)*self.fsky*(det_theory_plus_error_cross_obs/det_theory_plus_error + math.log(det_theory_plus_error/det_observ) - self.nbin ) + dof*vector[k]**2
+                    except ValueError:
+                        warnings.warn("Euclid_lensing: Could not evaluate chi2 including theoretical error with the current parameters. The corresponding chi2 is now set to nan!")
+                        break
+                        break
+                        break
+                        chi2 = np.nan
 
 
                     # Computing first
@@ -550,20 +550,20 @@ class euclid_lensing(Likelihood):
 
 
             else:
-		if self.use_lmax_lincut:
+                if self.use_lmax_lincut:
                     det_cross = 0.
-                    for i in xrange(0,self.nbin-CutBin):
+                    for i in range(0,self.nbin-CutBin):
                         newCov = np.copy(Cov_theory[index, CutBin:, CutBin:])
                         newCov[:, i] = Cov_observ[index, CutBin:, CutBin+i]
                         det_cross += np.linalg.det(newCov)
-		else:
+                else:
                     det_cross = 0.
-                    for i in xrange(self.nbin):
+                    for i in range(self.nbin):
                         newCov = np.copy(Cov_theory[index, :, :])
                         newCov[:, i] = Cov_observ[index, :, i]
                         det_cross += np.linalg.det(newCov)
 
-		if self.use_lmax_lincut:
+                if self.use_lmax_lincut:
                     chi2 += (2.*ell+1.)*self.fsky*(det_cross/det_theory + math.log(det_theory/det_observ) - self.nbin+CutBin)
                 else:
                     chi2 += (2.*ell+1.)*self.fsky*(det_cross/det_theory + math.log(det_theory/det_observ) - self.nbin)
