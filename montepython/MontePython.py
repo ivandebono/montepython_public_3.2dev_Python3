@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 .. module:: MontePython
    :synopsis: Main module
@@ -9,7 +9,7 @@ Monte Python, a Monte Carlo Markov Chain code (with Class!)
 import sys
 import warnings
 
-import io_mp # all the input/output mechanisms 
+import io_mp    # all the input/output mechanisms 
 from run import run
 
 
@@ -33,7 +33,7 @@ if __name__ == '__main__':
         pass
 
     if MPI_ASKED:
-#         # This import has to be there in case MPI is not installed
+    # This import has to be there in case MPI is not installed
         from run import mpi_run
         sys.exit(mpi_run())
     else:

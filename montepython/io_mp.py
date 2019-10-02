@@ -289,7 +289,7 @@ def create_output_files(command_line, data):
             for line in open(restartname, 'r'):
                 data.out.write(line)
         except:
-            raise ConfigurationError('Error loading chains files. '
+            raise ConfigurationError('Error loading chain files. '
                                      'Ensure number of MPI processes =< number of chains to restart, '
                                      'and chain filename passed with -r <path/filename> corresponds to '
                                      'the full chain name of the lowest chain suffix to restart, e.g. '

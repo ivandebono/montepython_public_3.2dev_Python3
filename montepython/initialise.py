@@ -90,6 +90,7 @@ def initialise(custom_command=''):
         elif command_line.method == 'PC':
             from PolyChord import initialise as initialise_pc
             initialise_pc(cosmo, data, command_line)
+        # NN: Creating the NN subfolder and the NeuralNest arguments
         elif command_line.method == 'NN':
             from NeuralNest import initialise as initialise_nn
             initialise_nn(cosmo, data, command_line)

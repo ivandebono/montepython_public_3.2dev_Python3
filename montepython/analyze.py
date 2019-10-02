@@ -74,6 +74,13 @@ def analyze(command_line):
     information_instances = []
     for item in files:
         info = Information(command_line)
+        #Parse the --bins option correctly. If integer, pass as integer.
+        #If string, pass as string.
+        if info.bins.isdigit():
+            info.bins=int(info.bins)
+        else: pass
+        import pdb
+        pdb.set_trace()
         information_instances.append(info)
 
         # Prepare the files, according to the case, load the log.param, and
@@ -133,7 +140,7 @@ def analyze(command_line):
         io_mp.write_bestfit_file(bestfit_line, info.backup_names,
                                  info.best_fit_path)
 
-    # Overwrite center of Fisher matrix from log.param with the bestfit
+    # Overwrite centre of Fisher matrix from log.param with the bestfit
     # from the last set of chains provided
     # DEBUG: This doesn't plot the first parameter (omega_b), possibly
     # because it's re-scaled (since it's the only one that is rescaled
@@ -529,6 +536,7 @@ def compute_posterior(information_instances):
                 #
                 # simply the histogram from the chains, with few bins
                 #
+
                 info.hist, info.bin_edges = np.histogram(
                     info.chain[:, info.native_index+2], bins=info.bins,
                     weights=info.chain[:, 0], normed=False, density=False)

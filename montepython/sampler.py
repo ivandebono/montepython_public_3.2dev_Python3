@@ -356,7 +356,7 @@ def get_minimum(cosmo, data, command_line, covmat):
     if not command_line.silent:
         warnings.warn("Minimization implementation is being tested")
 
-    # Create the center dictionary, which will hold the center point
+    # Create the centre dictionary, which will hold the centre point
     # information
     center = {}
     parameter_names = data.get_mcmc_parameters(['varying'])

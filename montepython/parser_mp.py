@@ -596,10 +596,12 @@ def create_parser():
             <++>use this flag to avoid computing the posterior
             distribution.<++> This will decrease the time needed for the
             analysis, especially when analyzing big folders.<++>
-        <**>--bins<**> : int
-            <++>number of bins in the histograms<++> used to derive posterior
+        <**>--bins<**> : int or string
+            <++>if int, used equal-width bins for the histograms<++> used to derive posterior
             probabilities and credible intervals (default to 20). Decrease this
-            number for smoother plots at the expense of masking details.<++>
+            number for smoother plots at the expense of masking details. If string, 
+            defines method used by numpy.histogram 1.17. If 'bayesian_blocks', uses
+            Bayesian Blocks method from astropy<++>
         <**>-T<**> : float
             <++>Raise posteriors to the power T.<++>
             Interpret the chains as samples from the probability distribution
@@ -946,7 +948,7 @@ def create_parser():
                             action='store_true')
     # -- number of bins (defaulting to 20)
     infoparser.add_argument('--bins', help=helpdict['bins'],
-                            type=int, default=20)
+                            type=str, default='20')
     # -- temperature (OPTIONAL)
     infoparser.add_argument('-T', help=helpdict['T'], type=float,
                            dest='temperature', default=1.0)
