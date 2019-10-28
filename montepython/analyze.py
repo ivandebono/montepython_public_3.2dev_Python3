@@ -37,7 +37,7 @@ import numpy.linalg as la
 
 # Defined to remove the burnin for all the points that were produced before the
 # first time where -log-likelihood <= min-minus-log-likelihood+LOG_LKL_CUTOFF
-LOG_LKL_CUTOFF = 3
+#Default: LOG_LKL_CUTOFF = 3
 
 NUM_COLORS = 6
 
@@ -79,8 +79,8 @@ def analyze(command_line):
         if info.bins.isdigit():
             info.bins=int(info.bins)
         else: pass
-        import pdb
-        pdb.set_trace()
+        #import pdb
+        #pdb.set_trace()
         information_instances.append(info)
 
         # Prepare the files, according to the case, load the log.param, and
@@ -346,7 +346,7 @@ def convergence(info):
 
 def compute_posterior(information_instances):
     """
-    computes the marginalized posterior distributions, and optionnally plots
+    computes the marginalized posterior distributions, and optionally plots
     them
 
     Parameters
@@ -355,7 +355,7 @@ def compute_posterior(information_instances):
         list of information objects, initialised on the given folders, or list
         of file, in input. For each of these instance, plot the 1d and 2d
         posterior distribution, depending on the flags stored in the instances,
-        comming from command line arguments or read from a file.
+        coming from command line arguments or read from a file.
     """
     # For convenience, store as `conf` the first element of the list
     # information_instances, since it will be called often to check for
@@ -536,10 +536,16 @@ def compute_posterior(information_instances):
                 #
                 # simply the histogram from the chains, with few bins
                 #
-
-                info.hist, info.bin_edges = np.histogram(
-                    info.chain[:, info.native_index+2], bins=info.bins,
-                    weights=info.chain[:, 0], normed=False, density=False)
+                if info.bins == 'blocks': #Bayesian Blocks method:
+                    from astropy import stats as astropy_stats
+                    info.hist, info.bin_edges = astropy_stats.histogram(
+                        info.chain[:, info.native_index+2], bins='blocks',
+                        weights=info.chain[:, 0], normed=False, density=False)
+                
+                else:
+                    info.hist, info.bin_edges = np.histogram(
+                        info.chain[:, info.native_index+2], bins=info.bins,
+                        weights=info.chain[:, 0], normed=False, density=False)
                 info.hist = info.hist/info.hist.max()
                 # Correct for temperature
                 info.hist = info.hist**conf.temperature
@@ -556,7 +562,7 @@ def compute_posterior(information_instances):
                 info.interp_hist, info.interp_grid = cubic_interpolation(
                     info, info.hist, info.bincenters)
 
-                # minimum credible interval (method by Jan Haman). Fails for
+                # minimum credible interval (method by Jan Hamann). Fails for
                 # multimodal histograms
                 bounds = minimum_credible_intervals(info)
                 info.bounds[info.native_index] = bounds
@@ -1102,11 +1108,13 @@ def ctr_level(histogram2d, lvl, infinite=False):
 
 def minimum_credible_intervals(info):
     """
-    Extract minimum credible intervals (method from Jan Haman) FIXME
+    Extract minimum credible intervals (method from Jan Hamann) FIXME
     """
     histogram = info.hist
     bincenters = info.bincenters
     levels = info.levels
+    #import pdb
+    #pdb.set_trace()
 
     bounds = np.zeros((len(levels), 2))
     j = 0
@@ -1230,7 +1238,7 @@ def cubic_interpolation(info, hist, bincenters):
 
     """
 
-    # we start from a try becuase if anything goes wrong, we want to return the raw histogram rather than nothing
+    # we start from a try because if anything goes wrong, we want to return the raw histogram rather than nothing
     try:
 
         # test that all elements are strictly positive, otherwise we could not take the log, and we must switch to the robust method
@@ -1837,7 +1845,7 @@ def remove_bad_points(info):
             # Remove burn-in, defined as all points until the likelhood reaches min_minus_lkl+LOG_LKL_CUTOFF
             # except when it is run in adaptive mode
             if not info.adaptive:
-                while cheese[start, 1] > info.min_minus_lkl+LOG_LKL_CUTOFF:
+                while cheese[start, 1] > info.min_minus_lkl+info.loglkl_cutoff:
                         start += 1
             burnin = start-markovian
 
@@ -2183,6 +2191,10 @@ class Information(object):
         # file), at the level of precision defined by the number of bins, the
         # ticks and x_range should be altered in order to display this
         # meaningful number instead.
+        if not isinstance(self.bins,int): self.bins=20
+        #import pdb
+        print("BINS=",self.bins)
+        #pdb.set_trace()
         for i in range(np.shape(self.ticks)[0]):
             x_range = self.x_range[i]
             bounds = self.boundaries[i]

@@ -602,6 +602,12 @@ def create_parser():
             number for smoother plots at the expense of masking details. If string, 
             defines method used by numpy.histogram 1.17. If 'bayesian_blocks', uses
             Bayesian Blocks method from astropy<++>
+        <**>--loglkl_cutoff<**> : float
+            <++>Defined to remove the burnin for all the points that were 
+            produced before the first time where <++>
+            -log-likelihood <= min-minus-log-likelihood+LOG_LKL_CUTOFFtoff 
+            (default to 3). Increase this number to include more points. 
+            Useful for ill-behaved distributions<++> 
         <**>-T<**> : float
             <++>Raise posteriors to the power T.<++>
             Interpret the chains as samples from the probability distribution
@@ -949,6 +955,9 @@ def create_parser():
     # -- number of bins (defaulting to 20)
     infoparser.add_argument('--bins', help=helpdict['bins'],
                             type=str, default='20')
+    # -- log Likelihood cutoff (defaulting to 3)
+    infoparser.add_argument('--loglkl_cutoff', help=helpdict['loglkl_cutoff'],
+                            type=float, default=3)
     # -- temperature (OPTIONAL)
     infoparser.add_argument('-T', help=helpdict['T'], type=float,
                            dest='temperature', default=1.0)
