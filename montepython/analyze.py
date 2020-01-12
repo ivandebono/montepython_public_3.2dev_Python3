@@ -208,7 +208,7 @@ def prepare(files, info):
             return False
 
     # If the input command was an entire folder, then grab everything in it.
-    # Too small files (below 600 octets) and subfolders are automatically
+    # Too small files (below 600 bytes) and subfolders are automatically
     # removed.
     folder, files, basename = recover_folder_and_files(files)
 
@@ -331,6 +331,8 @@ def convergence(info):
             info.steps))
         log.write("--> Total number of accepted steps: %d\n" % (
             info.accepted_steps))
+        log.write("--> Log likelihood cutoff: %d\n" % (
+            info.loglkl_cutoff))
         log.write("--> Minimum of -logLike           : %.2f" % (
             info.min_minus_lkl))
 
@@ -537,12 +539,14 @@ def compute_posterior(information_instances):
                 # simply the histogram from the chains, with few bins
                 #
                 if info.bins == 'blocks': #Bayesian Blocks method:
+                    print('Using Bayesian blocks method')
                     from astropy import stats as astropy_stats
                     info.hist, info.bin_edges = astropy_stats.histogram(
                         info.chain[:, info.native_index+2], bins='blocks',
                         weights=info.chain[:, 0], normed=False, density=False)
                 
                 else:
+                    #print('Using equally-spaced bins. Bins=',info.bins)
                     info.hist, info.bin_edges = np.histogram(
                         info.chain[:, info.native_index+2], bins=info.bins,
                         weights=info.chain[:, 0], normed=False, density=False)

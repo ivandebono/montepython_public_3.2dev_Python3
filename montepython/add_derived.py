@@ -11,10 +11,14 @@ except ImportError:
 from multiprocessing import Pool
 import os
 
-from . import io_mp
-from . import sampler
-from .data import Data
-from .data import Parameter
+#from . import io_mp
+import io_mp
+#from . import sampler
+import sampler
+#from .data import Data
+from data import Data
+#from .data import Parameter
+from data import Parameter
 from classy import CosmoComputationError
 
 
