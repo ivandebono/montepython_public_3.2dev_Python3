@@ -1,8 +1,8 @@
 # My own likelihood and data files
 # montepython/likelihoods/euclid_lensing_wwip/*
 # montepython/likelihoods/euclid_pk_wwip/*
-# montepyton/data/euclid_lensing_wwip*
-# montepyton/data/euclid_pk_wwip*
+# montepyton/data/euclid_lensing_wwip*.dat
+# montepyton/data/euclid_pk_wwip*.dat
 
 # Files created by vim to backup
 *~
