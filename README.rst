@@ -3,7 +3,7 @@ Monte Python, a Monte Carlo Markov Chain code (with Class!)
 ===========================================================
 
 :Main developer: Ivan Debono <ivan.debono@apc.in2p3.fr>
-:Authosr: Thejs Brinckmann <brinckmann@physik.rwth-aachen.de>, Benjamin Audren <benjamin.audren@epfl.ch>
+:Authors: Thejs Brinckmann <brinckmann@physik.rwth-aachen.de>, Benjamin Audren <benjamin.audren@epfl.ch>
 :License: MIT
 
 
@@ -31,7 +31,7 @@ v3.2.0, Aug 21, 2019
 Details and Examples
 --------------------
 
-Python 3 version of MontePython.
+Python 3 version of MontePython. 
 
 If you are searching for further details or specific examples of a work session,
 please refer to the online documentation. See also the `Monte Python 3 paper
@@ -81,9 +81,8 @@ Prerequisites
 
 * You need the python program **version 3.6.7** or above.
 
-
 * Your python of choice must have `numpy` (version >= 1.4.1) and `cython`. The
-  later is used to wrap CLASS in python.
+  later is used to wrap CLASS in python. CLASS must be compiled for Python 3.
 
 * *[optional]* If you want to use fully the plotting capabilities of Monte Python,
   you also need the `scipy`, with interpolate, and `matplotlib` modules.
