@@ -1045,9 +1045,12 @@ class Likelihood_clik(Likelihood):
 
         # compute likelihood
         #print "lkl:",self.clik(tot)
-        lkl = self.clik(tot)[0]
-
-        # add prior on nuisance parameters
+        #Ensures that Planck likelihood errors are silenced
+        try:
+            lkl = self.clik(tot)[0]
+        except Exception:
+            lkl=-np.inf
+        #add prior on nuisance parameters
         lkl = self.add_nuisance_prior(lkl, data)
 
         return lkl
