@@ -9,6 +9,8 @@ basic functions, as well as more specific likelihood classes that may be reused
 to implement new ones.
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 import os
 import numpy as np
 import math
@@ -19,7 +21,9 @@ import scipy.integrate
 import scipy.interpolate
 import scipy.misc
 
-import io_mp
+#from . 
+from . import io_mp
+from six.moves import range
 
 
 class Likelihood(object):
@@ -60,9 +64,9 @@ class Likelihood(object):
 
         # Recover the values potentially read in the input.param file.
         if hasattr(data, self.name):
-            exec("global attributes; attributes = [e for e in dir(data.{}) if e.find('__') == -1]".format(self.name))
+            exec("attributes = [e for e in dir(data.%s) if e.find('__') == -1]" % self.name, locals(), globals())
             for elem in attributes:
-                exec("setattr(self, elem, getattr(data.{}, elem))".format(self.name))
+                exec("setattr(self, elem, getattr(data.%s, elem))" % self.name)
 
         # Read values from the data file
         self.read_from_file(path, data, command_line)
@@ -190,7 +194,7 @@ class Likelihood(object):
 
         # convert dimensionless C_l's to C_l in muK**2
         T = cosmo.T_cmb()
-        for key in cl.keys():
+        for key in list(cl.keys()):
             # All quantities need to be multiplied by this factor, except the
             # phi-phi term, that is already dimensionless
             # phi cross-terms should only be multiplied with this factor once
@@ -212,7 +216,7 @@ class Likelihood(object):
 
         # convert dimensionless C_l's to C_l in muK**2
         T = cosmo.T_cmb()
-        for key in cl.keys():
+        for key in list(cl.keys()):
             # All quantities need to be multiplied by this factor, except the
             # phi-phi term, that is already dimensionless
             # phi cross-terms should only be multiplied with this factor once
@@ -243,7 +247,7 @@ class Likelihood(object):
 
         """
         array_flag = False
-        for key, value in dictionary.items():
+        for key, value in list(dictionary.items()):
             try:
                 data.cosmo_arguments[key]
                 try:
@@ -297,7 +301,7 @@ class Likelihood(object):
             except:
                 print('Warning: you did not pass a file name containing ')
                 print('a contamination spectrum regulated by the nuisance ')
-                print('parameter '+nuisance)
+                print(('parameter '+nuisance))
 
             # read renormalization factor
             # if it is not there, assume it is one, i.e. do not renormalize
@@ -915,7 +919,7 @@ class Likelihood_clik(Likelihood):
             for i in range(len(self.nuisance)):
                 if (self.nuisance[i] == 'A_Planck'):
                     self.nuisance[i] = 'A_planck'
-            print("In %s, MontePython corrected nuisance parameter name A_Planck to A_planck" % self.name)
+            print(("In %s, MontePython corrected nuisance parameter name A_Planck to A_planck" % self.name))
 
         # testing if the nuisance parameters are defined. If there is at least
         # one non defined, raise an exception.
@@ -1442,7 +1446,7 @@ class Likelihood_mock_cmb(Likelihood):
             fid_file = open(os.path.join(
                 self.data_directory, self.fiducial_file), 'w')
             fid_file.write('# Fiducial parameters')
-            for key, value in data.mcmc_parameters.items():
+            for key, value in list(data.mcmc_parameters.items()):
                 fid_file.write(', %s = %.5g' % (
                     key, value['current']*value['scale']))
             fid_file.write('\n')
@@ -1942,10 +1946,10 @@ class Likelihood_mpk(Likelihood):
         will be transfered to wigglez_a, b, c and d
 
         """
-        for key, value in common_dictionary.items():
+        for key, value in list(common_dictionary.items()):
             # First, check if the parameter exists already
             try:
-                exec("self.{}".format(key))
+                exec("self.%s" % key)
                 warnings.warn(
                     "parameter %s from likelihood %s will be replaced by " +
                     "the common knowledge routine" % (key, self.name))

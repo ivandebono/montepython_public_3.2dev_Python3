@@ -1,0 +1,21 @@
+# This likelihood corresponds to the Planck 2018 high_l TT data (only high l temperature)
+
+# Grab the clik version of the Planck high_l_TT likelihood:
+extended_plik_Planck_highl_TT.path_clik = os.path.join(data.path['clik'], '../../../extended_plik/plc_3.0/hi_l/plik/plik_rd12_HM_v22_TT_bin1.clik')
+
+
+# List of nuisance parameters needed for high_l_TT
+extended_plik_Planck_highl_TT.A_planck_prior_center            = 1
+extended_plik_Planck_highl_TT.A_planck_prior_variance          = 0.0025
+extended_plik_Planck_highl_TT.calib_100T_prior_center          = 1.0002
+extended_plik_Planck_highl_TT.calib_100T_prior_variance        = 0.0007
+extended_plik_Planck_highl_TT.calib_217T_prior_center          = 0.99805
+extended_plik_Planck_highl_TT.calib_217T_prior_variance        = 0.00065
+extended_plik_Planck_highl_TT.gal545_A_100_prior_center        = 8.6
+extended_plik_Planck_highl_TT.gal545_A_100_prior_variance      = 2
+extended_plik_Planck_highl_TT.gal545_A_143_prior_center        = 10.6
+extended_plik_Planck_highl_TT.gal545_A_143_prior_variance      = 2
+extended_plik_Planck_highl_TT.gal545_A_143_217_prior_center    = 23.5
+extended_plik_Planck_highl_TT.gal545_A_143_217_prior_variance  = 8.5
+extended_plik_Planck_highl_TT.gal545_A_217_prior_center        = 91.9
+extended_plik_Planck_highl_TT.gal545_A_217_prior_variance      = 20
