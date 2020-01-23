@@ -1054,6 +1054,7 @@ class Likelihood_clik(Likelihood):
             lkl = self.clik(tot)[0]
         except Exception:
             lkl=-np.inf
+            warnings.warn('Planck likelihood returned an error')
         #add prior on nuisance parameters
         lkl = self.add_nuisance_prior(lkl, data)
 
